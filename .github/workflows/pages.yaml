@@ -1,0 +1,27 @@
+on:
+  push: 
+    branches: [ "main" ]
+
+jobs:
+  deploy-page:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+      
+      - run: npm ci
+      - run: npm build
+        env:
+          # TODO: Cannot be implemented with GitHub Pages.
+          HTACCESS_USER: ${{ secrets.HTACCESS_USER }}
+          HTACCESS_PASSWORD: ${{ secrets.HTACCESS_PASSWORD }}
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.3.0
+        with:
+          branch: gh-pages
+          folder: build
