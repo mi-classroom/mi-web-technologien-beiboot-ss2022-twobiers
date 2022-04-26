@@ -14,7 +14,7 @@ jobs:
           cache: npm
       
       - run: npm ci
-      - run: npm build
+      - run: npm run build
         env:
           # TODO: Cannot be implemented with GitHub Pages.
           HTACCESS_USER: ${{ secrets.HTACCESS_USER }}
