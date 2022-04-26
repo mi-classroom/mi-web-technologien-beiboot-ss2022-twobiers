@@ -17,7 +17,7 @@ const initDb = (database: IDBPDatabase<DBV1>) => {
     });
 };
 
-const db = await openDB<DBV1>(IDX_DB_NAME, IDX_DB_VERSION, {
+const _db = openDB<DBV1>(IDX_DB_NAME, IDX_DB_VERSION, {
     upgrade(database, oldVersion, _newVersion, _transaction) {
         const v0Db = database as unknown as IDBPDatabase<DBV1>;
         // Remember to not use breaks to leverage fall-through.
@@ -29,6 +29,7 @@ const db = await openDB<DBV1>(IDX_DB_NAME, IDX_DB_VERSION, {
 });
 
 export const saveItems = async (items: CdaItem[]): Promise<number[]> => {
+    const db = await _db;
     if(items.length === 0) return [];
     if(items.length === 1) return [await db.add("items", items[0], items[0].objectId)];
 
@@ -39,11 +40,13 @@ export const saveItems = async (items: CdaItem[]): Promise<number[]> => {
 }
 
 export const hasAnyItems = async(): Promise<boolean> => {
+    const db = await _db;
     const c = await db.count("items");
     return c > 0;
 }
 
-export const getBestOfItems = (): Promise<CdaItem[]> => db.getAll("items")
+export const getBestOfItems = (): Promise<CdaItem[]> => _db
+    .then(db => db.getAll("items"))
     .then(items => items
         .filter(item => item.isBestOf)
         .sort((a, b) => a.sortingNumber.localeCompare(b.sortingNumber)));

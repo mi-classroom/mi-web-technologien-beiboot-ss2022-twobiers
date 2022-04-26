@@ -51,22 +51,26 @@ const renderItems = (items: CdaItem[]) => {
     }
 };
 
-// TODO: Render toolbar conditionally
-if(await hasAnyItems()) {
-    toolbar.style.display = "none";
-    renderItems(await getBestOfItems());
-} else {
-    const uploadFile = document.querySelector<HTMLInputElement>("#uploadFile")!;
-    uploadFile.addEventListener("change", async (event) => {
-        const file = (event.target as HTMLInputElement).files?.item(0);
-        if(!!file) {
-            const content: CdaItemCollection = JSON.parse(await file.text());
-            const result = await saveItems(content.items);
-            console.log(`Successfully saved ${result.length} items in IndexDB`);
-            toolbar.style.display = "none";
-            
-            renderItems(await getBestOfItems());
-        }
-    }, false);
+const init = async() => {
+    // TODO: Render toolbar conditionally
+    if(await hasAnyItems()) {
+        toolbar.style.display = "none";
+        renderItems(await getBestOfItems());
+    } else {
+        const uploadFile = document.querySelector<HTMLInputElement>("#uploadFile")!;
+        uploadFile.addEventListener("change", async (event) => {
+            const file = (event.target as HTMLInputElement).files?.item(0);
+            if(!!file) {
+                const content: CdaItemCollection = JSON.parse(await file.text());
+                const result = await saveItems(content.items);
+                console.log(`Successfully saved ${result.length} items in IndexDB`);
+                toolbar.style.display = "none";
+                
+                renderItems(await getBestOfItems());
+            }
+        }, false);
+    }
 }
 
+init()
+    .then(() => console.log("Initilization completed"));
