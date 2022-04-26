@@ -1,0 +1,27 @@
+body {
+    background-color: darkslategray;
+}
+
+#toolbar {
+    display: flex;
+    flex-direction: row;
+}
+
+.item {
+    background-color: gray;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0px;
+    align-items: center;
+    border: black solid 1px;
+    padding: 15px;
+    img {
+        width: 200px;
+    }
+}
+
+#item-stream {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
