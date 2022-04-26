@@ -1,0 +1,25 @@
+{
+  "name": "mi-web-technologien-beiboot-ss2022-twobiers",
+  "version": "1.0.0",
+  "description": "Zum Modul Web Technologien gibt es ein begleitendes Projekt. Im Rahmen dieses Projekts werden wir von Veranstaltung zu Veranstaltung ein Projekt sukzessive weiter entwickeln und uns im Rahmen der Veranstaltung den Fortschritt anschauen, Code Reviews machen und Entwicklungsschritte vorstellen und diskutieren.",
+  "main": "index.js",
+  "private": "true",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mi-classroom/mi-web-technologien-beiboot-ss2022-twobiers.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mi-classroom/mi-web-technologien-beiboot-ss2022-twobiers/issues"
+  },
+  "homepage": "https://github.com/mi-classroom/mi-web-technologien-beiboot-ss2022-twobiers#readme",
+  "devDependencies": {
+    "sass": "^1.51.0",
+    "typescript": "^4.5.4",
+    "vite": "^2.9.5"
+  }
+}
