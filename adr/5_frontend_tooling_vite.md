@@ -16,6 +16,7 @@ Try [Vite](https://vitejs.dev/)
 
 Pros:
 * TypeScript support out of the box (overcomes cons from [ADR - Programming Language - TypeSecript](./1_language_ts.md))
+* built-in support for Sass (provided styles are in Sass)
 * Built-in server with fast restart gives fast development feedback
 * No bundling necessary - modern ES Modules can be used
 
