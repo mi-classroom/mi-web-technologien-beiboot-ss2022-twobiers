@@ -15,11 +15,7 @@ jobs:
       
       - run: npm ci
       - run: npm run build
-        env:
-          # TODO: Cannot be implemented with GitHub Pages.
-          HTACCESS_USER: ${{ secrets.HTACCESS_USER }}
-          HTACCESS_PASSWORD: ${{ secrets.HTACCESS_PASSWORD }}
-
+      
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.3.0
         with:
