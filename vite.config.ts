@@ -5,6 +5,6 @@ export default defineConfig(({ command, mode}) => {
     return {
         // Need to adjust the base-url because of the GitHub pages deployment.
         // Under GitHub Pages the base url is equal to the repository name.
-        base: env.VITE_BASE_URL || '/'
+        base: env.VITE_BASE_URL || '/',
     }
 });
