@@ -1,6 +1,3 @@
-import './assets/styles/scss/abstracts/variables.scss';
-import './assets/styles/scss/abstracts/fonts.scss';
-import './assets/styles/scss/abstracts/icons.scss';
 import './main.scss';
 import { getBestOfItems, hasAnyItems, saveItems } from './storage/storage';
 import { CdaItem, CdaItemCollection } from './types';

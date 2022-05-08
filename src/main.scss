@@ -1,5 +1,9 @@
+@import './assets/styles/scss/abstracts/fonts.scss';
+@import './assets/styles/scss/abstracts/variables.scss';
+@import './assets/styles/scss/abstracts/icons.scss';
+
 body {
-    background-color: darkslategray;
+    background-color: $darker;
 }
 
 #toolbar {
@@ -8,12 +12,12 @@ body {
 }
 
 .item {
-    background-color: gray;
+    background-color: $light;
     display: flex;
     flex-direction: column;
     flex: 1 1 0px;
     align-items: center;
-    border: black solid 1px;
+    border: $darkest solid 1px;
     padding: 15px;
     img {
         width: 200px;
