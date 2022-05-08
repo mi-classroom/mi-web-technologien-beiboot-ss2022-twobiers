@@ -51,6 +51,8 @@ const renderItems = (items: CdaItem[]) => {
 };
 
 const init = async() => {
+    // If we have already uploaded items in the storage, render the best of items.
+    // Otherwise render the uploader
     // TODO: Render toolbar conditionally
     if(await hasAnyItems()) {
         toolbar.style.display = "none";

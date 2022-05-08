@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-interface ImprotMetaEnv {
+interface ImportMetaEnv {
     readonly VITE_BASE_URL: string | undefined;
 }
 

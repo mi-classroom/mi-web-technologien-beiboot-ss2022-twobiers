@@ -1,9 +1,10 @@
 import { DBSchema, IDBPDatabase, openDB } from "idb";
 import { CdaItem } from "../types";
 
-const IDX_DB_NAME = "lucascranach";
-const IDX_DB_VERSION = 1;
+const IDX_DB_NAME = "lucascranach"; // IndexedDB Name
+const IDX_DB_VERSION = 1;           // Current IndexedDB Schema Version
 
+// IndexedDB Schema Version 1
 interface DBV1 extends DBSchema {
     "items": { 
         key: number; 
@@ -11,6 +12,7 @@ interface DBV1 extends DBSchema {
     }
 }
 
+// Migration script for Schema Version 1
 const initDb = (database: IDBPDatabase<DBV1>) => {
     database.createObjectStore("items", {
         keyPath: "objectId"
@@ -28,6 +30,12 @@ const _db = openDB<DBV1>(IDX_DB_NAME, IDX_DB_VERSION, {
     },
 });
 
+/**
+ * Stores all provided items inside the storage. Rejects if any of the provided items already
+ * exists. 
+ * @param items items from the dataset
+ * @returns created IDs
+ */
 export const saveItems = async (items: CdaItem[]): Promise<number[]> => {
     const db = await _db;
     if(items.length === 0) return [];
@@ -39,12 +47,18 @@ export const saveItems = async (items: CdaItem[]): Promise<number[]> => {
     return res;
 }
 
+/**
+ * Checks whether any items are in the store
+ */
 export const hasAnyItems = async(): Promise<boolean> => {
     const db = await _db;
     const c = await db.count("items");
     return c > 0;
 }
 
+/**
+ * @returns Returns all items marked as bestOf in the storage
+ */
 export const getBestOfItems = (): Promise<CdaItem[]> => _db
     .then(db => db.getAll("items"))
     .then(items => items

@@ -1,3 +1,5 @@
+/* Dataset typings
+---------------------------------------------------------------------------- */
 export type CdaItemImage = {
     overall: {
         images: Array<{
@@ -28,3 +30,6 @@ export type CdaItem = {
 export type CdaItemCollection = {
     items: CdaItem[];
 };
+
+/* 
+---------------------------------------------------------------------------- */
