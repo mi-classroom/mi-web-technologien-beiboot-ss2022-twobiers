@@ -7,10 +7,13 @@ Accepted
 ## Context
 
 With the need of dependencies a package mangement is required.
+Valid options are:
+- [yarn](https://yarnpkg.com/)
+- [npm](https://www.npmjs.com/)
 
 ## Decision
 
-Use [npm](https://www.npmjs.com/) as package management.
+Most of the Use [npm](https://www.npmjs.com/) as package management.
 
 ## Consequences
 

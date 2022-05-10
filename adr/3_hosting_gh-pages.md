@@ -7,10 +7,15 @@ Accepted
 ## Context
 
 The application needs to be deployed somewhere.
+Valid options are:
+- [ADV Labor](http://www.gm.fh-koeln.de/advlabor/)
+- Cloud Hosting provider like [Heroku](https://www.heroku.com/) or [Firebase](https://firebase.google.com/)
+- Custom Hosting
+- [GitHub Pages](https://pages.github.com/)
 
 ## Decision
 
-Use [GitHub pages](https://pages.github.com/) to deploy the application.
+Because GitHub Pages is fairly easy to use and brings everything that is necessary for this project it is used to deploy the application.
 
 ## Consequences
 
