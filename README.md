@@ -26,11 +26,15 @@ Prerequisites:
 - [Docker](https://www.docker.com/)
 
 ## Run locally 
-1. Run
+1. Install Dependencies
+```
+npm install
+```
+2. Run
 ```
 npm run dev
 ```
-2. Go to [http://localhost:3000/](http://localhost:3000/)
+3. Go to [http://localhost:3000/](http://localhost:3000/)
 
 ## Run with docker
 
