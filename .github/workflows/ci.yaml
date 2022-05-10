@@ -19,7 +19,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
-          push: true
+          push: false
           tags: twobiers:latest
           cache-from: type=gha
           cache-to: type=gha
