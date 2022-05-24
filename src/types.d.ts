@@ -17,6 +17,12 @@ export type CdaItemMetadata = {
     date: string;
 };
 
+export type CdaItemDating = {
+    dated: string;
+    begin: number;
+    end: number;
+};
+
 export type CdaItem = {
     objectId: number;
     metadata: CdaItemMetadata;
@@ -26,6 +32,7 @@ export type CdaItem = {
     images: CdaItemImage;
     sortingNumber: string;
     dimensions: string;
+    dating: CdaItemDating;
 };
 
 export type CdaItemCollection = {
