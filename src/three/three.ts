@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { animateControls, initControls } from "./controls";
+import { makeTextSprite } from "./utils";
 
 const renderer = new THREE.WebGLRenderer( { antialias: true } );
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -44,10 +45,18 @@ export const createTimeline = (startYear: number, endYear: number) => {
 
     const dir = new THREE.Vector3(0, 0, 1); // direction alignment on z-axis
     const origin = new THREE.Vector3(0, 1, 0); // Preserve Axes helper, therefore move one level up
+    const lengthOfYear = 10;
 
-    const length = yearDiff;
+    for(let year = startYear; year <= endYear; ++year) {
+        const startLabel = makeTextSprite(`${year}`);
+        const offsetZ = origin.z + Math.abs(startYear - year) * lengthOfYear;
+        startLabel.position.set(origin.x, 10, offsetZ);
+        scene.add(startLabel);
+    }
+
+    const length = yearDiff * lengthOfYear;
     const color = 0xffff00;
-    const arrowHelper = new THREE.ArrowHelper(dir, origin, length, color);
+    const arrowHelper = new THREE.ArrowHelper(dir, origin, length, color, 1, 1);
 
     scene.add(arrowHelper);
 };
