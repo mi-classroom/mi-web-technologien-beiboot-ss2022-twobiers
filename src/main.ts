@@ -1,6 +1,6 @@
 import './main.scss';
 import { getBestOfItems, hasAnyItems, saveItems } from './storage/storage';
-import { getSceneCanvas } from './three/three';
+import { createTimeline, getSceneCanvas } from './three/three';
 import { CdaItem, CdaItemCollection, DimensionizedCdaItem } from './types';
 import { parseDimensions } from './utils/dimensionParser';
 
@@ -75,6 +75,9 @@ const init = async() => {
             }
             return dimensionized;
         });
+
+        // const startYear = dimensionizedBestOfItems.map(item => item.)
+
         showCanvas();
     }
 }
