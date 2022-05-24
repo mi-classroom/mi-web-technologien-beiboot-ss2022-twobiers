@@ -59,24 +59,29 @@ const initKeys = () => {
 };
 
 export const animateControls = () => {
-    const delta = clock.getDelta();
+    if(controls.isLocked) {
+        const delta = clock.getDelta();
 
-    velocity.x -= velocity.x * 10.0 * delta;
-    velocity.z -= velocity.z * 10.0 * delta;
+        velocity.x -= velocity.x * 10.0 * delta;
+        velocity.z -= velocity.z * 10.0 * delta;
 
-    direction.z = Number(moveForward) - Number(moveBackward);
-    direction.x = Number(moveRight) - Number(moveLeft);
-    direction.normalize();
+        direction.z = Number(moveForward) - Number(moveBackward);
+        direction.x = Number(moveRight) - Number(moveLeft);
+        direction.normalize();
 
-    if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
-    if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;
+        if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
+        if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;
 
-    controls.moveRight(-velocity.x * delta);
-    controls.moveForward(-velocity.z * delta);
+        controls.moveRight(-velocity.x * delta);
+        controls.moveForward(-velocity.z * delta);
+    }
 };
 
 export const initControls = (camera: THREE.Camera, element: HTMLElement): PointerLockControls => {
     controls = new PointerLockControls(camera, element);
+
+    element.addEventListener("click", () => controls.lock(), false);
+
     initKeys();
     return controls;
 };
