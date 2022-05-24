@@ -4,54 +4,12 @@ import { CdaItem, CdaItemCollection, DimensionizedCdaItem } from './types';
 import { parseDimensions } from './utils/dimensionParser';
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
+const canvas = document.createElement("canvas");
 
-const createStreamItem = (item: CdaItem): HTMLDivElement => {
-    const domItem = document.createElement('div');
-    domItem.classList.add("item");
-
-    const previewImgSrc = item.images.overall.images[0].sizes.medium.src;
-    const title = item.metadata.title;
-    const date = item.metadata.date;
-    const type = item.medium.substring(0, item.medium.indexOf("(")).trim();
-    const owner = item.repository;
-
-    // Just build the inner DOM manually as we're going to use some 3D projection anyway
-    // in the future.
-    domItem.innerHTML = `
-        <img alt=${title} src=${previewImgSrc} />
-        <table class="metadata">
-            <tr>
-                <td>Titel</td>
-                <td>${title}</td>
-            </tr>
-            <tr>
-                <td>Datierung</td>
-                <td>${date}</td>
-            </tr>
-            <tr>
-                <td>Art</td>
-                <td>${type}</td>
-            </tr>
-            <tr>
-                <td>Besizer</td>
-                <td>${owner}</td>
-            </tr>
-        </table>
-    `;
-
-    return domItem;
-}
-
-const renderItems = (items: CdaItem[]) => {
-    // Clear children
-    const stream = document.createElement("div");
-    stream.classList.add("item-stream");
-    for(const item of items) {
-        stream.appendChild(createStreamItem(item));
-    }
+const showCanvas = () => {
     app.innerHTML = '';
-    app.appendChild(stream);
-};
+    app.appendChild(canvas);
+}
 
 const createDivider = (): HTMLSpanElement => {
     const divider = document.createElement("div");
@@ -77,7 +35,7 @@ const renderUploadBanner = () => {
             console.log(`Successfully saved ${result.length} items in IndexDB`);
             uploadBanner.style.display = "none";
             
-            renderItems(await getBestOfItems());
+            showCanvas();
         }
     }, false);
     const fileUploadButton = document.createElement("input");
@@ -118,7 +76,7 @@ const init = async() => {
             return dimensionized;
         });
         console.log(dimensionizedBestOfItems);
-        renderItems(bestOfItems);
+        showCanvas();
     }
 }
 
