@@ -76,9 +76,14 @@ const init = async() => {
             return dimensionized;
         });
 
-        // const startYear = dimensionizedBestOfItems.map(item => item.)
+    
+        // Just use the begin date as date source
+        const years = dimensionizedBestOfItems.map(item => item.dating.begin);
+        const startYear = Math.min(...years);
+        const endYear = Math.max(...years);
 
         showCanvas();
+        createTimeline(startYear, endYear);
     }
 }
 
