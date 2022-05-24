@@ -25,6 +25,7 @@ export type CdaItem = {
     isBestOf: boolean;
     images: CdaItemImage;
     sortingNumber: string;
+    dimensions: string;
 };
 
 export type CdaItemCollection = {
@@ -33,3 +34,29 @@ export type CdaItemCollection = {
 
 /* 
 ---------------------------------------------------------------------------- */
+
+export type Shape = "rectangle" | "circle";
+
+export type RectDimension = {
+    width: number;
+    height: number;
+    depth?: number;
+};
+
+export type CircleDimension = {
+    diameter: number;
+};
+
+export type ItemRectDimensions = {
+    shape: "rectangle";
+    dimension: RectDimension;
+};
+
+export type ItemCircleDimensions = {
+    shape: "circle";
+    dimension: CircleDimension
+};
+
+export type ItemDimensions = ItemRectDimensions | ItemCircleDimensions;
+
+export type DimensionizedCdaItem = CdaItem | (CdaItem | { dimensions: ItemDimensions });

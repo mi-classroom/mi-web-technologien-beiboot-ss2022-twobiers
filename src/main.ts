@@ -1,6 +1,7 @@
 import './main.scss';
 import { getBestOfItems, hasAnyItems, saveItems } from './storage/storage';
-import { CdaItem, CdaItemCollection } from './types';
+import { CdaItem, CdaItemCollection, DimensionizedCdaItem } from './types';
+import { parseDimensions } from './utils/dimensionParser';
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
 
@@ -106,7 +107,18 @@ const init = async() => {
     if(!(await hasAnyItems())) {
         renderUploadBanner();
     } else {
-        renderItems(await getBestOfItems());
+        const bestOfItems = await getBestOfItems();
+        // TODO: We could perform a migration in the IndexedDB and safe the parsed dimensions there.
+        //       Leave it for the moment and see whether it works anyway.
+        const dimensionizedBestOfItems = bestOfItems.map(item => {
+            const dimensionized: DimensionizedCdaItem = {
+                ...item,
+                dimensions: parseDimensions(item.dimensions)
+            }
+            return dimensionized;
+        });
+        console.log(dimensionizedBestOfItems);
+        renderItems(bestOfItems);
     }
 }
 
