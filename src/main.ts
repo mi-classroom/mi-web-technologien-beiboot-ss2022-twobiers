@@ -1,14 +1,14 @@
 import './main.scss';
 import { getBestOfItems, hasAnyItems, saveItems } from './storage/storage';
+import { getSceneCanvas } from './three/three';
 import { CdaItem, CdaItemCollection, DimensionizedCdaItem } from './types';
 import { parseDimensions } from './utils/dimensionParser';
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
-const canvas = document.createElement("canvas");
 
 const showCanvas = () => {
     app.innerHTML = '';
-    app.appendChild(canvas);
+    app.appendChild(getSceneCanvas());
 }
 
 const createDivider = (): HTMLSpanElement => {
@@ -75,7 +75,6 @@ const init = async() => {
             }
             return dimensionized;
         });
-        console.log(dimensionizedBestOfItems);
         showCanvas();
     }
 }

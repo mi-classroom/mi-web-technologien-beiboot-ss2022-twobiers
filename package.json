@@ -20,11 +20,13 @@
   "homepage": "https://github.com/mi-classroom/mi-web-technologien-beiboot-ss2022-twobiers#readme",
   "devDependencies": {
     "@types/node": "^17.0.27",
+    "@types/three": "^0.140.0",
     "sass": "^1.51.0",
     "typescript": "^4.5.4",
     "vite": "^2.9.5"
   },
   "dependencies": {
-    "idb": "^7.0.1"
+    "idb": "^7.0.1",
+    "three": "^0.140.2"
   }
 }
