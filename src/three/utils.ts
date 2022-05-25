@@ -12,18 +12,17 @@ export const makeTextSprite = (message: string) => {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d')!;
     context.font = "Bold " + fontsize + "px " + fontface;
-    var metrics = context.measureText(message);
-    var textWidth = metrics.width;
+    const metrics = context.measureText(message);
 
     context.fillStyle = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," + backgroundColor.b + "," + backgroundColor.a + ")";
     context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";
     context.fillStyle = "rgba(" + textColor.r + ", " + textColor.g + ", " + textColor.b + ", 1.0)";
     context.fillText(message, borderThickness, fontsize + borderThickness);
 
-    var texture = new THREE.Texture(canvas)
+    const texture = new THREE.Texture(canvas);
     texture.needsUpdate = true;
-    var spriteMaterial = new THREE.SpriteMaterial({ map: texture });
-    var sprite = new THREE.Sprite(spriteMaterial);
+    const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+    const sprite = new THREE.Sprite(spriteMaterial);
     sprite.scale.set(0.5 * fontsize, 0.25 * fontsize, 0.75 * fontsize);
     return sprite;
 };

@@ -15,6 +15,18 @@ const initScene = () => {
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
 
+    scene.background = new THREE.Color( 0x878787 );
+	scene.fog = new THREE.Fog( 0x878787, 0, 750 );
+
+    // Add Floor
+    const floorGeometry = new THREE.PlaneBufferGeometry(2000, 2000, 100, 100);
+    const floorMaterial = new THREE.MeshBasicMaterial( { 
+        color: 0x565656
+    } );
+    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    floor.rotateX(-Math.PI / 2);
+    scene.add(floor);
+
     window.addEventListener("resize", () => {
         camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
