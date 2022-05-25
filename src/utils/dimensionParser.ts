@@ -46,7 +46,7 @@ const cleanDim = (dim: string): string => {
     let clean = dim;
     
     // Remove comments
-    clean = clean.replaceAll(/(?:[\(\[]).*(?:[\]\)])/g, "");
+    clean = clean.replaceAll(/[\(\[][^\(\[\)\]]*[\]\)]/g, "");
 
     // Use . as decimal
     clean = clean.replaceAll(",", ".");
