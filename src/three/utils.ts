@@ -1,18 +1,32 @@
 import * as THREE from "three";
 
+interface Color {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+}
 
-export const makeTextSprite = (message: string) => {
-    const fontface = "Courier New";
-    const fontsize = 18;
-    const borderThickness = 4;
-    const borderColor = { r: 0, g: 0, b: 0, a: 1.0 };
-    const backgroundColor = { r: 0, g: 0, b: 255, a: 1.0 };
-    const textColor = { r: 255, g: 255, b: 255, a: 1.0 };
+interface TextSpriteProperties {
+    fontface?: string;
+    fontsize?: number;
+    borderThickness?: number;
+    borderColor?: Color;
+    backgroundColor?: Color;
+    textColor?: Color;
+};
+
+export const makeTextSprite = (message: string, properties: TextSpriteProperties = {}) => {
+    const fontface = properties.fontface ? properties.fontface : "Courier New";
+    const fontsize = properties.fontsize ? properties.fontsize : 18;
+    const borderThickness = properties.borderThickness ? properties.borderThickness : 4;
+    const borderColor = properties.borderColor ? properties.borderColor : { r: 0, g: 0, b: 0, a: 1.0 };
+    const backgroundColor = properties.backgroundColor ? properties.backgroundColor : { r: 0, g: 0, b: 255, a: 1.0 };
+    const textColor = properties.textColor ? properties.textColor : { r: 255, g: 255, b: 255, a: 1.0 };
 
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d')!;
     context.font = "Bold " + fontsize + "px " + fontface;
-    const metrics = context.measureText(message);
 
     context.fillStyle = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," + backgroundColor.b + "," + backgroundColor.a + ")";
     context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";

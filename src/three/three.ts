@@ -49,7 +49,7 @@ const animate = () => {
 
 };
 
-export const createTimeline = (startYear: number, endYear: number) => {
+export const createTimeline = (startYear: number, endYear: number, spacing: number = 40) => {
     const yearDiff = endYear - startYear;
     if(yearDiff <= 0) {
         throw new Error("Invalid years provided, difference must be greater than 0");
@@ -57,10 +57,10 @@ export const createTimeline = (startYear: number, endYear: number) => {
 
     const dir = new THREE.Vector3(0, 0, 1); // direction alignment on z-axis
     const origin = new THREE.Vector3(0, 1, 0); // Preserve Axes helper, therefore move one level up
-    const lengthOfYear = 10;
+    const lengthOfYear = new THREE.Vector3(1, 0, 0).length() * spacing;
 
     for(let year = startYear; year <= endYear; ++year) {
-        const startLabel = makeTextSprite(`${year}`);
+        const startLabel = makeTextSprite(`${year}`, { fontsize: 32 });
         const offsetZ = origin.z + Math.abs(startYear - year) * lengthOfYear;
         startLabel.position.set(origin.x, 10, offsetZ);
         scene.add(startLabel);
