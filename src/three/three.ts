@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { Box3, Vector3 } from "three";
+import { threadId } from "worker_threads";
 import { DimensionizedCdaItem, ItemDimensions } from "../types";
 import { animateControls, initControls } from "./controls";
 import { makeTextSprite } from "./utils";
@@ -7,6 +8,13 @@ import { makeTextSprite } from "./utils";
 const renderer = new THREE.WebGLRenderer( { antialias: true } );
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const scene = new THREE.Scene();
+
+// Add Floor
+const floorGeometry = new THREE.PlaneBufferGeometry(1000, 1000, 100, 100);
+const floorMaterial = new THREE.MeshBasicMaterial( { 
+    color: 0x565656
+} );
+const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 
 // object where artworks added to the scene will be saved with their dating as key.
 const artworks: Record<number, DimensionizedCdaItem[]> = {};
@@ -23,12 +31,6 @@ const initScene = () => {
     scene.background = new THREE.Color( 0x878787 );
 	scene.fog = new THREE.Fog( 0x878787, 0, 750 );
 
-    // Add Floor
-    const floorGeometry = new THREE.PlaneBufferGeometry(2000, 2000, 100, 100);
-    const floorMaterial = new THREE.MeshBasicMaterial( { 
-        color: 0x565656
-    } );
-    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
     floor.rotateX(-Math.PI / 2);
     scene.add(floor);
 
@@ -48,7 +50,10 @@ const render = () => {
 const animate = () => {
     requestAnimationFrame( animate );
 
-   animateControls();
+    animateControls();
+
+    // Update floor to camera positon, so that it makes an illusion of infinite floor
+    floor.position.set(camera.position.x, floor.position.y, camera.position.z);
 
     renderer.render( scene, camera );
 
