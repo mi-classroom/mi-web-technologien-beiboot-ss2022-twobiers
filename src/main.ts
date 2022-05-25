@@ -76,6 +76,12 @@ const init = async() => {
             if(Object.values(dimensionized.dimensions.dimension).some(v => Number.isNaN(v))) {
                 console.warn("There is a NaN value in parsed dimensions. Check your parser");
             }
+            if(item.dating.begin === 1530) {
+                console.log({
+                    d1: item,
+                    d2: dimensionized.dimensions
+                });
+            }
             return dimensionized;
         });
 

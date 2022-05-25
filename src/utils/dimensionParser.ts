@@ -52,8 +52,9 @@ const cleanDim = (dim: string): string => {
     clean = clean.replaceAll(",", ".");
 
     // If we have anywhere two digits that are not formattet like a range
-    // like "84.5    84.6 x" or "84.5 / 84.6" just extract the first one
-    clean = clean.replaceAll(/(\d+(?:[\.]\d+)?)\s*[\s\/]\s*\d+(?:[\.]\d+)?/g, "$1");
+    // like "84.5    84.6 x" or "84.5 / 84.6" just extract the second one
+    // Why the second one? Because there's one artwork in 1530 with an nonplausbile width
+    clean = clean.replaceAll(/\d+(?:[\.]\d+)?\s*[\s\/]\s*(\d+(?:[\.]\d+)?)/g, "$1");
 
     // We will make it "easier" for the parser and remove everything that is not required for parsing the dimensions
     clean = clean.replaceAll(/[^\d\.x\-]/g, "");
@@ -75,7 +76,8 @@ const parseDimArray = (cleanString: string): number[] => {
 }
 
 /**
- * Parses dimensions from a textual dimension description
+ * Parses dimensions from a textual dimension description.
+ * Note that the parser is heavily optimized on the bestOf collection only.
  * @param dimString textual description
  * @returns parsed dimensions
  */
