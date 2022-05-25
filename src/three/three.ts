@@ -1,10 +1,15 @@
 import * as THREE from "three";
+import { Box3, Vector3 } from "three";
+import { DimensionizedCdaItem, ItemDimensions } from "../types";
 import { animateControls, initControls } from "./controls";
 import { makeTextSprite } from "./utils";
 
 const renderer = new THREE.WebGLRenderer( { antialias: true } );
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const scene = new THREE.Scene();
+
+// object where artworks added to the scene will be saved with their dating as key.
+const artworks: Record<number, DimensionizedCdaItem[]> = {};
 
 scene.add(new THREE.AxesHelper(100));
 
@@ -49,7 +54,57 @@ const animate = () => {
 
 };
 
-export const createTimeline = (startYear: number, endYear: number, spacing: number = 40) => {
+const createGeometry = (dimensions: ItemDimensions): THREE.BufferGeometry => {
+    switch(dimensions.shape) {
+        case "circle":
+            return new THREE.CircleGeometry(dimensions.dimension.diameter / 2, 32);
+        case "rectangle":
+            return new THREE.BoxGeometry(dimensions.dimension.width, dimensions.dimension.height, dimensions.dimension.depth);
+    }
+};
+
+const createArtworkMesh = async (artwork: DimensionizedCdaItem): Promise<THREE.Mesh> => {
+    const geometry = createGeometry(artwork.dimensions);
+    const url = artwork.images.overall.images[0].sizes.medium.src.replaceAll("imageserver-2022", "data-proxy/image.php?subpath=");
+    const texture = await new THREE.TextureLoader().loadAsync(url);
+    const material = new THREE.MeshBasicMaterial({ 
+        color: 0xFFFFFF,
+        map: texture
+    });
+    return new THREE.Mesh(geometry, material);
+};
+
+const addArtwork = async (artwork: DimensionizedCdaItem, z: number) => {
+    console.log(artwork);
+    // Lets just stick to the begin dating to make things easy
+    const year = artwork.dating.begin;
+
+    const mesh = await createArtworkMesh(artwork);
+    let y = 10;
+    switch(artwork.dimensions.shape) {
+        case "rectangle":
+            const box = mesh.geometry.boundingBox ? mesh.geometry.boundingBox : new THREE.Box3().setFromObject(mesh);
+            y = box.getSize(new Vector3()).y / 2;
+            break;
+        case "circle":
+            y = artwork.dimensions.dimension.diameter * 2;
+            break;
+    }
+
+    const x = ((artworks[year]?.length ?? 0) + 1) * 20;
+    mesh.position.set(x, y, z);
+    mesh.rotateY(-90 * Math.PI / 180); // Rotate to align on timeline
+
+    scene.add(mesh);
+
+    if(!artworks[year]) {
+        artworks[year] = [];
+    }
+    artworks[year].push(artwork);
+};
+
+
+const createTimeline = (startYear: number, endYear: number, spacing: number = 40) => {
     const yearDiff = endYear - startYear;
     if(yearDiff <= 0) {
         throw new Error("Invalid years provided, difference must be greater than 0");
@@ -71,6 +126,19 @@ export const createTimeline = (startYear: number, endYear: number, spacing: numb
     const arrowHelper = new THREE.ArrowHelper(dir, origin, length, color, 1, 1);
 
     scene.add(arrowHelper);
+};
+
+export const setArtworks = async (artworks: DimensionizedCdaItem[]) => {
+    // Just use the begin date as date source
+    const years = artworks.map(item => item.dating.begin);
+    const startYear = Math.min(...years);
+    const endYear = Math.max(...years);
+    createTimeline(startYear, endYear);
+
+    for(const artwork of artworks) {
+        const z = Math.abs(startYear - artwork.dating.begin) * (new THREE.Vector3(1, 0, 0).length() * 40);
+        addArtwork(artwork, z);
+    }
 };
 
 export const getSceneCanvas = (): HTMLCanvasElement => {

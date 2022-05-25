@@ -1,6 +1,6 @@
 import './main.scss';
 import { getBestOfItems, hasAnyItems, saveItems } from './storage/storage';
-import { createTimeline, getSceneCanvas } from './three/three';
+import { getSceneCanvas, setArtworks } from './three/three';
 import { CdaItem, CdaItemCollection, DimensionizedCdaItem } from './types';
 import { parseDimensions } from './utils/dimensionParser';
 
@@ -73,17 +73,15 @@ const init = async() => {
                 ...item,
                 dimensions: parseDimensions(item.dimensions)
             }
+            if(Object.values(dimensionized.dimensions.dimension).some(v => Number.isNaN(v))) {
+                console.warn("There is a NaN value in parsed dimensions. Check your parser");
+            }
             return dimensionized;
         });
 
-    
-        // Just use the begin date as date source
-        const years = dimensionizedBestOfItems.map(item => item.dating.begin);
-        const startYear = Math.min(...years);
-        const endYear = Math.max(...years);
-
         showCanvas();
-        createTimeline(startYear, endYear);
+
+        await setArtworks(dimensionizedBestOfItems);
     }
 }
 
