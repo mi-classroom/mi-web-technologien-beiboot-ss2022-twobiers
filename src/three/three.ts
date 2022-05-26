@@ -1,9 +1,14 @@
 import * as THREE from "three";
-import { Box3, Vector3 } from "three";
-import { threadId } from "worker_threads";
+import { Object3D, Vector3 } from "three";
 import { DimensionizedCdaItem, ItemDimensions } from "../types";
 import { animateControls, initControls } from "./controls";
 import { makeTextSprite } from "./utils";
+
+// TODO: Proper typing
+type ArtworkUserData = { 
+    year: number,
+    rawItem: DimensionizedCdaItem 
+};
 
 const renderer = new THREE.WebGLRenderer( { antialias: true } );
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -17,7 +22,7 @@ const floorMaterial = new THREE.MeshBasicMaterial( {
 const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 
 // object where artworks added to the scene will be saved with their dating as key.
-const artworks: Record<number, DimensionizedCdaItem[]> = {};
+const artworkObjects: Record<number, Object3D[]> = {};
 
 scene.add(new THREE.AxesHelper(100));
 
@@ -96,17 +101,21 @@ const addArtwork = async (artwork: DimensionizedCdaItem, z: number) => {
             break;
     }
 
-    const x = ((artworks[year]?.length ?? 0) + 1) * 20;
+    const x = ((artworkObjects[year]?.length ?? 0) + 1) * 20;
     mesh.position.set(x, y, z);
     mesh.rotateY(-90 * Math.PI / 180); // Rotate to align on timeline
+    mesh.userData = {
+        year,
+        rawItem: artwork
+    } as ArtworkUserData;
 
     scene.add(mesh);
 
-    if(!artworks[year]) {
-        artworks[year] = [];
+    if(!artworkObjects[year]) {
+        artworkObjects[year] = [];
         createTimelineEntry(`${year}`, z);
     }
-    artworks[year].push(artwork);
+    artworkObjects[year].push(mesh);
 };
 
 
