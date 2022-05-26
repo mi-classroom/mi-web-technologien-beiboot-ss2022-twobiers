@@ -3,6 +3,7 @@ import { Material, Mesh, MeshBasicMaterial, Object3D, Raycaster, Vector3 } from 
 import { DimensionizedCdaItem, ItemDimensions } from "../types";
 import { animateControls, initControls } from "./controls";
 import { calcSurfaceArea, makeTextSprite } from "./utils";
+import { Pane } from 'tweakpane';
 
 // TODO: Proper typing
 type ArtworkUserData = { 
@@ -30,6 +31,11 @@ const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 
+const pane = new Pane();
+const PROPS = {
+    highlightColor: 0x8cff32
+};
+
 // object where artworks added to the scene will be saved with their dating as key.
 //const artworkObjects: Record<number, Object3D[]> = {};
 
@@ -40,9 +46,25 @@ const onPointerMove = (event: PointerEvent) => {
 	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 };
 
-const initScene = () => {
+const toStart = () => {
     camera.position.set(-10, 10, -10);
     camera.rotation.set(0, 180 * Math.PI / 180, 0); // Turn aroundas
+};
+
+const initPane = () => {
+    const resetBtn = pane.addButton({
+        title: "Back to start"
+    });
+    resetBtn.on("click", toStart);
+
+    pane.addInput(PROPS, "highlightColor", {
+        view: 'color'
+    });
+};
+
+const initScene = () => {
+
+    toStart();
 
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -72,7 +94,7 @@ let highlightedArtworks: ArtworkObject[] = [];
 const highlightArtwork = (artwork: ArtworkObject) => {
     // TODO: type this
     if(artwork.material instanceof MeshBasicMaterial) {
-        artwork.material.color.set(0x8cff32);
+        artwork.material.color.set(PROPS.highlightColor);
     }
     highlightedArtworks.push(artwork);
 };
@@ -222,6 +244,9 @@ export const setArtworks = async (artworks: DimensionizedCdaItem[]) => {
 
 export const getSceneCanvas = (): HTMLCanvasElement => {
     initScene();
+
+    initPane();
+
     const controls = initControls(camera, renderer.domElement);
     scene.add(controls.getObject());
 
