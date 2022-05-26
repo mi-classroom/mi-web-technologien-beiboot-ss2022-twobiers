@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { ItemDimensions } from "../types";
 
 interface Color {
     r: number;
@@ -39,4 +40,13 @@ export const makeTextSprite = (message: string, properties: TextSpriteProperties
     const sprite = new THREE.Sprite(spriteMaterial);
     sprite.scale.set(0.5 * fontsize, 0.25 * fontsize, 0.75 * fontsize);
     return sprite;
+};
+
+export const calcSurfaceArea = (dimension: ItemDimensions): number => {
+    switch(dimension.shape) {
+        case "circle":
+            return Math.PI * Math.pow(dimension.dimension.diameter / 2, 2);
+        case "rectangle":
+            return dimension.dimension.width * dimension.dimension.height;
+    }
 };

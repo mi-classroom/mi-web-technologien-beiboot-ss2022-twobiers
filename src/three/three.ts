@@ -2,13 +2,14 @@ import * as THREE from "three";
 import { Object3D, Vector3 } from "three";
 import { DimensionizedCdaItem, ItemDimensions } from "../types";
 import { animateControls, initControls } from "./controls";
-import { makeTextSprite } from "./utils";
+import { calcSurfaceArea, makeTextSprite } from "./utils";
 
 // TODO: Proper typing
 type ArtworkUserData = { 
     year: number,
     rawItem: DimensionizedCdaItem 
 };
+type ArtworkObject = Object3D;
 
 const renderer = new THREE.WebGLRenderer( { antialias: true } );
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -22,7 +23,7 @@ const floorMaterial = new THREE.MeshBasicMaterial( {
 const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 
 // object where artworks added to the scene will be saved with their dating as key.
-const artworkObjects: Record<number, Object3D[]> = {};
+//const artworkObjects: Record<number, Object3D[]> = {};
 
 scene.add(new THREE.AxesHelper(100));
 
@@ -81,60 +82,82 @@ const createArtworkMesh = async (artwork: DimensionizedCdaItem): Promise<THREE.M
         color: 0xFFFFFF,
         map: texture
     });
-    return new THREE.Mesh(geometry, material);
-};
+    const mesh = new THREE.Mesh(geometry, material);
 
-const addArtwork = async (artwork: DimensionizedCdaItem, z: number) => {
-    console.log(artwork);
-    // Lets just stick to the begin dating to make things easy
     const year = artwork.dating.begin;
-
-    const mesh = await createArtworkMesh(artwork);
-    let y = 10;
-    switch(artwork.dimensions.shape) {
-        case "rectangle":
-            const box = mesh.geometry.boundingBox ? mesh.geometry.boundingBox : new THREE.Box3().setFromObject(mesh);
-            y = box.getSize(new Vector3()).y / 2;
-            break;
-        case "circle":
-            y = artwork.dimensions.dimension.diameter * 2;
-            break;
-    }
-
-    const x = ((artworkObjects[year]?.length ?? 0) + 1) * 20;
-    mesh.position.set(x, y, z);
-    mesh.rotateY(-90 * Math.PI / 180); // Rotate to align on timeline
     mesh.userData = {
         year,
         rawItem: artwork
     } as ArtworkUserData;
 
-    scene.add(mesh);
-
-    if(!artworkObjects[year]) {
-        artworkObjects[year] = [];
-        createTimelineEntry(`${year}`, z);
-    }
-    artworkObjects[year].push(mesh);
+    return mesh;
 };
 
+const createArtworkObjects = (artworks: DimensionizedCdaItem[]): Promise<ArtworkObject[]> => Promise.all(artworks.map(art => createArtworkMesh(art)));
 
-const createTimelineEntry = (entry: string, z: number) => {
-    const origin = new THREE.Vector3(0, 1, 0); // Preserve Axes helper, therefore move one level up
+const groupArtworkObjectsByDating = (objects: ArtworkObject[]): Record<number, ArtworkObject[]> => objects.reduce((acc, curr) => {
+    const year = (curr.userData as ArtworkUserData).year;
+    console.log(curr);
+    if(!acc[year]) {
+        acc[year] = []
+    }
+    acc[year].push(curr);
+    return acc;
+}, {} as Record<number, ArtworkObject[]>);
 
-    const label = makeTextSprite(entry, { fontsize: 32 });
-    label.position.set(origin.x, 10, z);
-    scene.add(label);
+const createArtworkModelGroupOfYear = (year: number, objects: ArtworkObject[]): THREE.Group => {
+    const group = new THREE.Group();
+
+    // Place a year indicator at the front
+    const label = makeTextSprite(`${year}`, { fontsize: 86 });
+    label.position.set(0, 20, 0);
+    group.add(label);
+
+    // Artworks will be placed NEXT to each other. 
+    for(const element of objects) {
+        const artwork = element;
+        const artworkBox = new THREE.Box3().setFromObject(artwork);
+        const groupBox = new THREE.Box3().setFromObject(group);
+        const artworkBoxSize = artworkBox.getSize(new THREE.Vector3());
+        const groupBoxSize = groupBox.getSize(new THREE.Vector3());
+        
+        artwork.rotateY(-90 * Math.PI / 180);
+        artwork.position.set(20, artworkBoxSize.y / 2, groupBoxSize.z + (artworkBoxSize.x / 2));
+        
+        group.add(artwork);
+    }
+
+    return group;
 };
 
 export const setArtworks = async (artworks: DimensionizedCdaItem[]) => {
-    // Just use the begin date as date source
-    const years = artworks.map(item => item.dating.begin);
-    const startYear = Math.min(...years);
+    // We sort the array by the dating to maintain consistency
+    artworks = artworks.sort((a, b) => a.dating.begin - b.dating.begin);
 
-    for(const artwork of artworks) {
-        const z = Math.abs(startYear - artwork.dating.begin) * 128;
-        addArtwork(artwork, z);
+    // First, we create all meshes from the artworks
+    const artworkObjects = await createArtworkObjects(artworks);
+
+    // Next, we group them by their particular dating
+    const groups = groupArtworkObjectsByDating(artworkObjects);
+    console.log(groups);
+
+    // We create modeled groups
+    const modeledGroups = Object.entries(groups).map(([year, arr]) => createArtworkModelGroupOfYear(Number(year), arr));
+
+    let currentOffset = 0;
+    for(const element of modeledGroups) {
+        const group = element;
+
+        group.position.set(group.position.x, group.position.y, currentOffset);
+
+        const groupBox = new THREE.Box3().setFromObject(group);
+        const groupBoxSize = groupBox.getSize(new THREE.Vector3());
+        currentOffset += groupBoxSize.z + 20;
+
+        const helper = new THREE.BoxHelper(group, 0xff0000);
+        helper.update();
+        scene.add(helper);
+        scene.add(group);
     }
 };
 
