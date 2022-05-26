@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Object3D, Vector3 } from "three";
+import { Material, Mesh, MeshBasicMaterial, Object3D, Raycaster, Vector3 } from "three";
 import { DimensionizedCdaItem, ItemDimensions } from "../types";
 import { animateControls, initControls } from "./controls";
 import { calcSurfaceArea, makeTextSprite } from "./utils";
@@ -9,7 +9,12 @@ type ArtworkUserData = {
     year: number,
     rawItem: DimensionizedCdaItem 
 };
-type ArtworkObject = Object3D;
+type ArtworkObject = Mesh;
+
+// Very trivial type guard, but sufficient
+const isArtworkObject = (object: Object3D) : object is ArtworkObject => {
+    return (typeof object.userData.year === "number");
+}
 
 const renderer = new THREE.WebGLRenderer( { antialias: true } );
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -22,10 +27,18 @@ const floorMaterial = new THREE.MeshBasicMaterial( {
 } );
 const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+
 // object where artworks added to the scene will be saved with their dating as key.
 //const artworkObjects: Record<number, Object3D[]> = {};
 
 scene.add(new THREE.AxesHelper(100));
+
+const onPointerMove = (event: PointerEvent) => {
+	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+};
 
 const initScene = () => {
     camera.position.set(-10, 10, -10);
@@ -47,10 +60,52 @@ const initScene = () => {
 		renderer.setSize( window.innerWidth, window.innerHeight );
         render();
     }, false);
+    window.addEventListener("pointermove", onPointerMove);
 };
 
 const render = () => {
     renderer.render(scene, camera);
+};
+
+let highlightedArtworks: ArtworkObject[] = [];
+
+const highlightArtwork = (artwork: ArtworkObject) => {
+    // TODO: type this
+    if(artwork.material instanceof MeshBasicMaterial) {
+        artwork.material.color.set(0x8cff32);
+    }
+    highlightedArtworks.push(artwork);
+};
+
+const unhighlightArtwork = (artwork: ArtworkObject) => {
+    // TODO: type this
+    if(artwork.material instanceof MeshBasicMaterial) {
+        artwork.material.color.set(0xffffff);
+    }
+    highlightedArtworks.splice(highlightedArtworks.indexOf(artwork));
+};
+
+const isHighlighted = (artwork: ArtworkObject) => highlightedArtworks.some(aw => aw === artwork);
+
+const highlightIntersectedArtworks = (rc: Raycaster) => {
+    const intersects = rc.intersectObjects( scene.children );
+    const artworkIntersections = intersects.filter(i => isArtworkObject(i.object));
+    const isIntersected = (artwork: ArtworkObject) => artworkIntersections.some(intersection => intersection.object === artwork && intersection.distance < 100);
+    for(const artworkIntersection of artworkIntersections) {
+        const object = artworkIntersection.object as ArtworkObject;
+        
+        if(!isHighlighted(object) && isIntersected(object)) {
+            highlightArtwork(object);
+        }
+    }
+
+    // Unhighlight all "pending" - artworks not currently intersected, but highlighted
+    const pendingHighlights = highlightedArtworks
+        .filter(aw => !isIntersected(aw))
+        .filter(aw => isHighlighted(aw));
+    for(const pendingHighlight of pendingHighlights) {
+        unhighlightArtwork(pendingHighlight);
+    }
 };
 
 const animate = () => {
@@ -60,6 +115,9 @@ const animate = () => {
 
     // Update floor to camera positon, so that it makes an illusion of infinite floor
     floor.position.set(camera.position.x, floor.position.y, camera.position.z);
+
+    raycaster.setFromCamera(pointer, camera);
+    highlightIntersectedArtworks(raycaster);
 
     renderer.render( scene, camera );
 
@@ -85,10 +143,11 @@ const createArtworkMesh = async (artwork: DimensionizedCdaItem): Promise<THREE.M
     const mesh = new THREE.Mesh(geometry, material);
 
     const year = artwork.dating.begin;
-    mesh.userData = {
+    const userData: ArtworkUserData = {
         year,
         rawItem: artwork
     } as ArtworkUserData;
+    mesh.userData = userData;
 
     return mesh;
 };
