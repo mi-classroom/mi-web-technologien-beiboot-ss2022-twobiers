@@ -104,44 +104,27 @@ const addArtwork = async (artwork: DimensionizedCdaItem, z: number) => {
 
     if(!artworks[year]) {
         artworks[year] = [];
+        createTimelineEntry(`${year}`, z);
     }
     artworks[year].push(artwork);
 };
 
 
-const createTimeline = (startYear: number, endYear: number, spacing: number = 40) => {
-    const yearDiff = endYear - startYear;
-    if(yearDiff <= 0) {
-        throw new Error("Invalid years provided, difference must be greater than 0");
-    }
-
-    const dir = new THREE.Vector3(0, 0, 1); // direction alignment on z-axis
+const createTimelineEntry = (entry: string, z: number) => {
     const origin = new THREE.Vector3(0, 1, 0); // Preserve Axes helper, therefore move one level up
-    const lengthOfYear = new THREE.Vector3(1, 0, 0).length() * spacing;
 
-    for(let year = startYear; year <= endYear; ++year) {
-        const startLabel = makeTextSprite(`${year}`, { fontsize: 32 });
-        const offsetZ = origin.z + Math.abs(startYear - year) * lengthOfYear;
-        startLabel.position.set(origin.x, 10, offsetZ);
-        scene.add(startLabel);
-    }
-
-    const length = yearDiff * lengthOfYear;
-    const color = 0xffff00;
-    const arrowHelper = new THREE.ArrowHelper(dir, origin, length, color, 1, 1);
-
-    scene.add(arrowHelper);
+    const label = makeTextSprite(entry, { fontsize: 32 });
+    label.position.set(origin.x, 10, z);
+    scene.add(label);
 };
 
 export const setArtworks = async (artworks: DimensionizedCdaItem[]) => {
     // Just use the begin date as date source
     const years = artworks.map(item => item.dating.begin);
     const startYear = Math.min(...years);
-    const endYear = Math.max(...years);
-    createTimeline(startYear, endYear);
 
     for(const artwork of artworks) {
-        const z = Math.abs(startYear - artwork.dating.begin) * (new THREE.Vector3(1, 0, 0).length() * 40);
+        const z = Math.abs(startYear - artwork.dating.begin) * 128;
         addArtwork(artwork, z);
     }
 };
