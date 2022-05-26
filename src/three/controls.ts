@@ -80,7 +80,11 @@ export const animateControls = () => {
 export const initControls = (camera: THREE.Camera, element: HTMLElement): PointerLockControls => {
     controls = new PointerLockControls(camera, element);
 
-    element.addEventListener("click", () => controls.lock(), false);
+    element.addEventListener("click", () => {
+        if(!controls.isLocked) {
+            controls.lock()
+        }
+    }, false);
 
     initKeys();
     return controls;

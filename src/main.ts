@@ -8,7 +8,8 @@ const app = document.querySelector<HTMLDivElement>("#app")!;
 
 const showCanvas = () => {
     app.innerHTML = '';
-    app.appendChild(getSceneCanvas());
+    // app.appendChild(getSceneCanvas());
+    document.body.appendChild(getSceneCanvas());
 }
 
 const createDivider = (): HTMLSpanElement => {

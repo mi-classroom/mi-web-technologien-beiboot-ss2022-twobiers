@@ -66,6 +66,9 @@ const initScene = () => {
 
     toStart();
 
+    camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+    
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -178,7 +181,6 @@ const createArtworkObjects = (artworks: DimensionizedCdaItem[]): Promise<Artwork
 
 const groupArtworkObjectsByDating = (objects: ArtworkObject[]): Record<number, ArtworkObject[]> => objects.reduce((acc, curr) => {
     const year = (curr.userData as ArtworkUserData).year;
-    console.log(curr);
     if(!acc[year]) {
         acc[year] = []
     }
@@ -220,7 +222,6 @@ export const setArtworks = async (artworks: DimensionizedCdaItem[]) => {
 
     // Next, we group them by their particular dating
     const groups = groupArtworkObjectsByDating(artworkObjects);
-    console.log(groups);
 
     // We create modeled groups
     const modeledGroups = Object.entries(groups).map(([year, arr]) => createArtworkModelGroupOfYear(Number(year), arr));
