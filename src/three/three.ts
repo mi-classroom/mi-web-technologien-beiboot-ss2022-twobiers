@@ -72,6 +72,23 @@ const initScene = () => {
     floor.rotateX(-Math.PI / 2);
     scene.add(floor);
 
+    // Crosshair
+    const cursorSize = 0.75;
+    const cursorThickness = 1.15;
+    const cameraMin = 0.1;
+    const cursorGeometry = new THREE.RingBufferGeometry(
+      cursorSize * cameraMin,
+      cursorSize * cameraMin * cursorThickness,
+      32,
+      0,
+      Math.PI * 0.5,
+      Math.PI * 2
+    );
+    const cursorMaterial = new THREE.MeshBasicMaterial({ color: "white" });
+    const cursor = new THREE.Mesh(cursorGeometry, cursorMaterial);
+    cursor.position.z = -cameraMin * 50;
+    camera.add(cursor);
+
     window.addEventListener("resize", () => {
         camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
