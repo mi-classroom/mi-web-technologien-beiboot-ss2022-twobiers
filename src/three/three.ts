@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Material, Mesh, MeshBasicMaterial, Object3D, Raycaster, Vector3 } from "three";
 import { DimensionizedCdaItem, ItemDimensions } from "../types";
 import { animateControls, initControls } from "./controls";
-import { calcSurfaceArea, makeTextSprite } from "./utils";
+import { calcSurfaceArea, getWebGLErrorMessage, isWebGL2Available, makeTextSprite } from "./utils";
 import { Pane } from 'tweakpane';
 
 // TODO: Proper typing
@@ -17,7 +17,13 @@ const isArtworkObject = (object: Object3D) : object is ArtworkObject => {
     return (typeof object.userData.year === "number");
 }
 
-const renderer = new THREE.WebGLRenderer( { antialias: true } );
+if(!isWebGL2Available()) {
+    document.body.appendChild(getWebGLErrorMessage());
+    throw new Error("WebGL is not supported");
+}
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const scene = new THREE.Scene();
 
