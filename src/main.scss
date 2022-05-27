@@ -9,6 +9,21 @@ body {
     margin: 0;
 }
 
+#info {
+    position: absolute;
+    top: 0px;
+    padding: 1rem;
+    z-index: 100;
+
+    .info-container {
+        margin: 1rem;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        max-width: 32rem;
+        background-color: $dark;
+    }
+}
+
 .upload-banner {
     width: 100%;
     z-index: $level-overlay;

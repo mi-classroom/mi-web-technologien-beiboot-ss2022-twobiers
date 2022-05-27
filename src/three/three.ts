@@ -10,7 +10,7 @@ type ArtworkUserData = {
     year: number,
     rawItem: DimensionizedCdaItem 
 };
-type ArtworkObject = Mesh;
+type ArtworkObject = Mesh & { userData: ArtworkUserData };
 
 // Very trivial type guard, but sufficient
 const isArtworkObject = (object: Object3D) : object is ArtworkObject => {
@@ -111,11 +111,14 @@ const render = () => {
 let highlightedArtworks: ArtworkObject[] = [];
 
 const highlightArtwork = (artwork: ArtworkObject) => {
+    console.log(artwork);
     // TODO: type this
     if(artwork.material instanceof MeshBasicMaterial) {
         artwork.material.color.set(PROPS.highlightColor);
     }
     highlightedArtworks.push(artwork);
+    const highlightEvent = new CustomEvent("highlight", { detail: artwork.userData.rawItem })
+    document.dispatchEvent(highlightEvent);
 };
 
 const unhighlightArtwork = (artwork: ArtworkObject) => {
@@ -124,6 +127,8 @@ const unhighlightArtwork = (artwork: ArtworkObject) => {
         artwork.material.color.set(0xffffff);
     }
     highlightedArtworks.splice(highlightedArtworks.indexOf(artwork));
+    const highlightEvent = new CustomEvent("unhighlight", { detail: artwork.userData.rawItem })
+    document.dispatchEvent(highlightEvent);
 };
 
 const isHighlighted = (artwork: ArtworkObject) => highlightedArtworks.some(aw => aw === artwork);
@@ -173,7 +178,7 @@ const createGeometry = (dimensions: ItemDimensions): THREE.BufferGeometry => {
     }
 };
 
-const createArtworkMesh = async (artwork: DimensionizedCdaItem): Promise<THREE.Mesh> => {
+const createArtworkMesh = async (artwork: DimensionizedCdaItem): Promise<ArtworkObject> => {
     const geometry = createGeometry(artwork.dimensions);
     const url = artwork.images.overall.images[0].sizes.medium.src.replaceAll("imageserver-2022", "data-proxy/image.php?subpath=");
     const texture = await new THREE.TextureLoader().loadAsync(url);
@@ -190,7 +195,7 @@ const createArtworkMesh = async (artwork: DimensionizedCdaItem): Promise<THREE.M
     } as ArtworkUserData;
     mesh.userData = userData;
 
-    return mesh;
+    return mesh as any as ArtworkObject;
 };
 
 const createArtworkObjects = (artworks: DimensionizedCdaItem[]): Promise<ArtworkObject[]> => Promise.all(artworks.map(art => createArtworkMesh(art)));

@@ -26,6 +26,10 @@ export const isWebGL2Available = () => {
     }
 };
 
+export const trimBraces = (str: string): string => {
+    return str.split(/[\[\(]/g)[0];
+};
+
 export const getWebGLErrorMessage = () => {
 		const message = 'Your browser does not seem to support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" style="color:#000">WebGL</a>';
 

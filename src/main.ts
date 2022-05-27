@@ -1,8 +1,11 @@
 import './main.scss';
 import { getBestOfItems, hasAnyItems, saveItems } from './storage/storage';
 import { getSceneCanvas, setArtworks } from './three/three';
+import { trimBraces } from './three/utils';
 import { CdaItem, CdaItemCollection, DimensionizedCdaItem } from './types';
 import { parseDimensions } from './utils/dimensionParser';
+
+const infoContainer: HTMLDivElement = document.getElementById("info")! as HTMLDivElement;
 
 const showCanvas = () => {
     document.body.appendChild(getSceneCanvas());
@@ -85,7 +88,41 @@ const init = async() => {
 
         await setArtworks(dimensionizedBestOfItems);
     }
-}
+};
+
+const buildArtworkInfo = (artwork: DimensionizedCdaItem): HTMLDivElement => {
+    const div = document.createElement("div");
+    div.classList.add("info-container");
+
+    div.innerHTML = `
+        <h1>${artwork.metadata.title}</h1>
+        <h2>${artwork.involvedPersons[0].name}</h2>
+        <span>${trimBraces(artwork.medium)}</span>
+        <span>${artwork.repository}</span>
+    `;
+    
+    return div;
+};
+
+const addArtworkInfo = (artwork: DimensionizedCdaItem) => {
+    console.log(artwork);
+    const id = artwork.objectId;
+    const existing = infoContainer.querySelector(`div[artwork-id="${id}"`);
+    if(!existing) {
+        const info = buildArtworkInfo(artwork);
+        info.setAttribute("artwork-id", String(id));
+        infoContainer.append(info);
+    }
+};
+
+const removeArtworkInfo = (artwork: DimensionizedCdaItem) => {
+    const id = artwork.objectId;
+    const existing = infoContainer.querySelector(`div[artwork-id="${id}"`);
+    existing?.remove();
+};
 
 init()
     .then(() => console.log("Initilization completed"));
+
+document.addEventListener("highlight", (event: any) => addArtworkInfo(event.detail));
+document.addEventListener("unhighlight", (event: any) => removeArtworkInfo(event.detail));

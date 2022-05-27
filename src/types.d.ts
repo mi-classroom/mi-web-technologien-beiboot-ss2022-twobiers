@@ -23,6 +23,10 @@ export type CdaItemDating = {
     end: number;
 };
 
+export type CdaInvolvedPerson = {
+    name: string;
+};
+
 export type CdaItem = {
     objectId: number;
     metadata: CdaItemMetadata;
@@ -33,6 +37,7 @@ export type CdaItem = {
     sortingNumber: string;
     dimensions: string;
     dating: CdaItemDating;
+    involvedPersons: CdaInvolvedPerson[];
 };
 
 export type CdaItemCollection = {
