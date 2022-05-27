@@ -10,52 +10,47 @@ const direction = new THREE.Vector3();
 let controls: PointerLockControls; 
 const clock = new THREE.Clock(true);
 
-const initKeys = () => {
-    const onKeyDown = (event: KeyboardEvent)  => {
-        switch (event.code) {
-            case 'ArrowUp':
-            case 'KeyW':
-                moveForward = true;
-                break;
-            case 'ArrowLeft':
-            case 'KeyA':
-                moveLeft = true;
-                break;
-            case 'ArrowDown':
-            case 'KeyS':
-                moveBackward = true;
-                break;
-            case 'ArrowRight':
-            case 'KeyD':
-                moveRight = true;
-                break;
-        }
+const onKeyDown = (event: KeyboardEvent)  => {
+    switch (event.code) {
+        case 'ArrowUp':
+        case 'KeyW':
+            moveForward = true;
+            break;
+        case 'ArrowLeft':
+        case 'KeyA':
+            moveLeft = true;
+            break;
+        case 'ArrowDown':
+        case 'KeyS':
+            moveBackward = true;
+            break;
+        case 'ArrowRight':
+        case 'KeyD':
+            moveRight = true;
+            break;
+    }
 
-    };
+};
 
-    const onKeyUp = (event: KeyboardEvent)  => {
-        switch (event.code) {
-            case 'ArrowUp':
-            case 'KeyW':
-                moveForward = false;
-                break;
-            case 'ArrowLeft':
-            case 'KeyA':
-                moveLeft = false;
-                break;
-            case 'ArrowDown':
-            case 'KeyS':
-                moveBackward = false;
-                break;
-            case 'ArrowRight':
-            case 'KeyD':
-                moveRight = false;
-                break;
-        }
-    };
-
-    document.addEventListener( 'keydown', onKeyDown );
-    document.addEventListener( 'keyup', onKeyUp );
+const onKeyUp = (event: KeyboardEvent)  => {
+    switch (event.code) {
+        case 'ArrowUp':
+        case 'KeyW':
+            moveForward = false;
+            break;
+        case 'ArrowLeft':
+        case 'KeyA':
+            moveLeft = false;
+            break;
+        case 'ArrowDown':
+        case 'KeyS':
+            moveBackward = false;
+            break;
+        case 'ArrowRight':
+        case 'KeyD':
+            moveRight = false;
+            break;
+    }
 };
 
 export const animateControls = () => {
@@ -86,6 +81,9 @@ export const initControls = (camera: THREE.Camera, element: HTMLElement): Pointe
         }
     }, false);
 
-    initKeys();
+
+    document.addEventListener( 'keydown', onKeyDown );
+    document.addEventListener( 'keyup', onKeyUp );
+
     return controls;
 };
