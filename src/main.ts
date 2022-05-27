@@ -4,11 +4,7 @@ import { getSceneCanvas, setArtworks } from './three/three';
 import { CdaItem, CdaItemCollection, DimensionizedCdaItem } from './types';
 import { parseDimensions } from './utils/dimensionParser';
 
-const app = document.querySelector<HTMLDivElement>("#app")!;
-
 const showCanvas = () => {
-    app.innerHTML = '';
-    // app.appendChild(getSceneCanvas());
     document.body.appendChild(getSceneCanvas());
 }
 
@@ -55,9 +51,8 @@ const renderUploadBanner = () => {
     uploadBanner.appendChild(createDivider());
     uploadBanner.appendChild(uploadContent);
     uploadBanner.appendChild(createDivider());
-    
-    app.innerHTML = '';
-    app.appendChild(uploadBanner);
+
+    document.body.appendChild(uploadBanner);
 };
 
 const init = async() => {
