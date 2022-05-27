@@ -29,7 +29,6 @@ const floorMaterial = new THREE.MeshBasicMaterial( {
 const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 
 const raycaster = new THREE.Raycaster();
-const pointer = new THREE.Vector2();
 
 const pane = new Pane();
 const PROPS = {
@@ -40,11 +39,6 @@ const PROPS = {
 //const artworkObjects: Record<number, Object3D[]> = {};
 
 scene.add(new THREE.AxesHelper(100));
-
-const onPointerMove = (event: PointerEvent) => {
-	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-};
 
 const toStart = () => {
     camera.position.set(-10, 10, -10);
@@ -85,7 +79,6 @@ const initScene = () => {
 		renderer.setSize( window.innerWidth, window.innerHeight );
         render();
     }, false);
-    window.addEventListener("pointermove", onPointerMove);
 };
 
 const render = () => {
@@ -141,7 +134,7 @@ const animate = () => {
     // Update floor to camera positon, so that it makes an illusion of infinite floor
     floor.position.set(camera.position.x, floor.position.y, camera.position.z);
 
-    raycaster.setFromCamera(pointer, camera);
+    raycaster.setFromCamera(new THREE.Vector2(), camera);
     highlightIntersectedArtworks(raycaster);
 
     renderer.render( scene, camera );
