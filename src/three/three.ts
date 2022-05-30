@@ -20,7 +20,7 @@ const raycaster = new THREE.Raycaster();
 let artworkObjects: Artwork3DObject[] = [];
 
 const highlightIntersectedArtworks = (rc: Raycaster) => {
-    const intersectedArtworks: THREE.Intersection<Artwork3DObject>[] = (rc.intersectObjects(artworkObjects, false) as any as THREE.Intersection<Artwork3DObject>[])
+    const intersectedArtworks = rc.intersectObjects<Artwork3DObject>(artworkObjects, false)
         .filter(intersection => intersection.distance < 100);
     for(const intersection of intersectedArtworks) {
         intersection.object.highlight();
@@ -48,16 +48,16 @@ const animate = () => {
     renderer.render( scene, camera );
 };
 
-const createArtworkObjects = (artworks: DimensionizedCdaItem[]): Promise<Artwork3DObject[]> => Promise.all(artworks.map(art => Artwork3DObject.buildArtworkObject(art)));
+const createArtworkObjects = (artworks: DimensionizedCdaItem[]) => Promise.all(artworks.map(art => Artwork3DObject.buildArtworkObject(art)));
 
-const groupArtworkObjectsByDating = (objects: Artwork3DObject[]): Record<number, Artwork3DObject[]> => objects.reduce((acc, curr) => {
+const groupArtworkObjectsByDating = (objects: Artwork3DObject[]) => objects.reduce<Record<number, Artwork3DObject[]>>((acc, curr) => {
     const year = curr.userData.year;
     if(!acc[year]) {
         acc[year] = []
     }
     acc[year].push(curr);
     return acc;
-}, {} as Record<number, Artwork3DObject[]>);
+}, {});
 
 const createArtworkModelGroupOfYear = (year: number, objects: Artwork3DObject[]): THREE.Group => {
     const group = new THREE.Group();

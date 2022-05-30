@@ -5,7 +5,7 @@ import { dimToString, trimBraces } from './three/utils';
 import { CdaItemCollection, DimensionizedCdaItem } from './types';
 import { parseDimensions } from './utils/dimensionParser';
 
-const infoContainer: HTMLDivElement = document.getElementById("info")! as HTMLDivElement;
+const infoContainer: HTMLElement = document.getElementById("info")!;
 
 const showCanvas = async () => {
     await loadArtworksIntoScene();
@@ -28,8 +28,8 @@ const renderUploadBanner = () => {
     fileUpload.id = "uploadFile";
     fileUpload.type = "file";
     fileUpload.accept = "application/json";
-    fileUpload.addEventListener("change", async (event) => {
-        const file = (event.target as HTMLInputElement).files?.item(0);
+    fileUpload.addEventListener("change", async (event: Event) => {
+        const file = (event.target as HTMLInputElement)?.files?.item(0);
         if(!!file) {
             const content: CdaItemCollection = JSON.parse(await file.text());
             const result = await saveItems(content.items);
