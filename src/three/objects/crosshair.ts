@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const cursorSize = 0.75;
+const cursorSize = 0.2;
 const cursorThickness = 1.15;
 const cameraMin = 0.1;
 const cursorGeometry = new THREE.RingBufferGeometry(

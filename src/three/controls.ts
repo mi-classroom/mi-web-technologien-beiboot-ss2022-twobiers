@@ -14,6 +14,7 @@ const clock = new THREE.Clock(true);
 
 type ControlProperties = {
     movementSpeed: number;
+    zoomAmount: number;
 }
 
 const onKeyDown = (event: KeyboardEvent)  => {
@@ -60,7 +61,8 @@ const onKeyUp = (event: KeyboardEvent)  => {
 };
 
 export let controlProperties: ControlProperties = {
-    movementSpeed: 20.0
+    movementSpeed: 20.0,
+    zoomAmount: 35
 };
 
 export const animateControls = () => {
@@ -82,14 +84,33 @@ export const animateControls = () => {
     }
 }
 
-export const createControls = (camera: THREE.Camera, element: HTMLElement): PointerLockControls => {
+export const createControls = (camera: THREE.PerspectiveCamera, element: HTMLElement): PointerLockControls => {
     controls = new PointerLockControls(camera, element);
 
-    element.addEventListener("click", () => {
-        if(!controls.isLocked) {
-            controls.lock()
+    element.addEventListener("click", (event: MouseEvent) => {
+        // Left click 
+        if(event.button === 0) {
+            if(!controls.isLocked) {
+                controls.lock()
+            }
         }
     }, false);
+
+    element.addEventListener("pointerdown", (event) => {
+        // Right click
+        if(event.button === 2) {
+            camera.fov -= controlProperties.zoomAmount;
+            camera.updateProjectionMatrix();
+        }
+    });
+
+    element.addEventListener("pointerup", (event) => {
+        // Right click
+        if(event.button === 2) {
+            camera.fov += controlProperties.zoomAmount;
+            camera.updateProjectionMatrix();
+        }
+    });
 
 
     document.addEventListener( 'keydown', onKeyDown );

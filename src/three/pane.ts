@@ -20,4 +20,10 @@ pane.addInput(controlProperties, "movementSpeed", {
     max: 100
 });
 
+pane.addInput(controlProperties, "zoomAmount", {
+    view: "number",
+    min: 0,
+    max: 100
+});
+
 export default pane;
