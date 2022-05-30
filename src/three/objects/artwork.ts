@@ -21,7 +21,8 @@ export const isArtworkObject = (object: Object3D) : object is ArtworkObject => {
 }
 
 export const artworkProperties = {
-    highlightColor: 0x8cff32
+    highlightColor: 0x8cff32,
+    scale: 0.1
 };
 
 const createGeometry = (dimensions: ItemDimensions): THREE.BufferGeometry => {
@@ -49,14 +50,16 @@ export class Artwork3DObject extends Mesh {
     }
 
     static async buildArtworkObject(artwork: DimensionizedCdaItem): Promise<Artwork3DObject> {
-        const geometry = createGeometry(artwork.dimensions);
+        const geometry = createGeometry(artwork.parsedDimensions);
         const url = artwork.images.overall.images[0].sizes.medium.src.replaceAll("imageserver-2022", "data-proxy/image.php?subpath=");
         const texture = await new THREE.TextureLoader().loadAsync(url);
         const material = new THREE.MeshBasicMaterial({ 
             color: 0xFFFFFF,
             map: texture
         });
-        return new this(geometry, material, artwork);
+        const mesh = new this(geometry, material, artwork);
+        mesh.scale.set(artworkProperties.scale, artworkProperties.scale, artworkProperties.scale);
+        return mesh;
     }
 
     highlight(): void {

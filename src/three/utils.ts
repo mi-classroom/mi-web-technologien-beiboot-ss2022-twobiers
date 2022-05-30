@@ -105,3 +105,12 @@ export const calcSurfaceArea = (dimension: ItemDimensions): number => {
             return dimension.dimension.width * dimension.dimension.height;
     }
 };
+
+export const dimToString = (dimension: ItemDimensions): string => {
+    switch(dimension.shape) {
+        case "circle":
+            return `${dimension.dimension.diameter}cm, Fläche: ${calcSurfaceArea(dimension)}cm²`;
+        case "rectangle":
+            return `${dimension.dimension.width} x ${dimension.dimension.height} cm (bxh), Fläche: ${calcSurfaceArea(dimension)}cm²`;
+    }
+};

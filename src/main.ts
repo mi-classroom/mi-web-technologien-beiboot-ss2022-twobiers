@@ -1,7 +1,7 @@
 import './main.scss';
 import { getBestOfItems, hasAnyItems, saveItems } from './storage/storage';
 import { getSceneCanvas, setArtworks } from './three/three';
-import { trimBraces } from './three/utils';
+import { dimToString, trimBraces } from './three/utils';
 import { CdaItemCollection, DimensionizedCdaItem } from './types';
 import { parseDimensions } from './utils/dimensionParser';
 
@@ -76,8 +76,9 @@ const buildArtworkInfo = (artwork: DimensionizedCdaItem): HTMLDivElement => {
     div.innerHTML = `
         <h1>${artwork.metadata.title}</h1>
         <h2>${artwork.involvedPersons[0].name}</h2>
-        <span>${trimBraces(artwork.medium)}</span>
-        <span>${artwork.repository}</span>
+        <p>${trimBraces(artwork.medium)}</p>
+        <p>${artwork.repository}</p>
+        <p>${dimToString(artwork.parsedDimensions)}</p>
     `;
     
     return div;
@@ -106,9 +107,9 @@ const loadArtworksIntoScene = async() => {
     const dimensionizedBestOfItems = bestOfItems.map(item => {
         const dimensionized: DimensionizedCdaItem = {
             ...item,
-            dimensions: parseDimensions(item.dimensions)
+            parsedDimensions: parseDimensions(item.dimensions)
         }
-        if(Object.values(dimensionized.dimensions.dimension).some(v => Number.isNaN(v))) {
+        if(Object.values(dimensionized.parsedDimensions.dimension).some(v => Number.isNaN(v))) {
             console.warn("There is a NaN value in parsed dimensions. Check your parser");
         }
         return dimensionized;

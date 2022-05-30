@@ -71,4 +71,4 @@ export type ItemCircleDimensions = {
 
 export type ItemDimensions = ItemRectDimensions | ItemCircleDimensions;
 
-export type DimensionizedCdaItem = (Omit<CdaItem, "dimensions"> & { dimensions: ItemDimensions });
+export type DimensionizedCdaItem = CdaItem & { parsedDimensions: ItemDimensions };
