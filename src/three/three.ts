@@ -1,10 +1,9 @@
 import * as THREE from "three";
-import { Material, Mesh, MeshBasicMaterial, Object3D, Raycaster, Scene, Vector3 } from "three";
-import { DimensionizedCdaItem, ItemDimensions } from "../types";
-import { animateControls, controlProperties, createControls } from "./controls";
-import { calcSurfaceArea, getWebGLErrorMessage, isWebGL2Available, makeTextSprite } from "./utils";
-import { crosshair } from "./objects/crosshair";
-import { ArtworkObject, isArtworkObject, artworkProperties, Artwork3DObject } from "./objects/artwork";
+import { Raycaster } from "three";
+import { DimensionizedCdaItem } from "../types";
+import { animateControls, createControls } from "./controls";
+import { getWebGLErrorMessage, isWebGL2Available, makeTextSprite } from "./utils";
+import { ArtworkObject, Artwork3DObject } from "./objects/artwork";
 import { camera, floor, renderer, scene } from "./objects/scene";
 import pane from "./pane";
 
@@ -14,6 +13,7 @@ if(!isWebGL2Available()) {
     throw new Error("WebGL is not supported");
 }
 
+// @ts-ignore
 const _pane = pane; // Keep to show the pane
 
 const raycaster = new THREE.Raycaster();

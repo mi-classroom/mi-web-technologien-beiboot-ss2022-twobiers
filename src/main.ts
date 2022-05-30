@@ -2,7 +2,7 @@ import './main.scss';
 import { getBestOfItems, hasAnyItems, saveItems } from './storage/storage';
 import { getSceneCanvas, setArtworks } from './three/three';
 import { trimBraces } from './three/utils';
-import { CdaItem, CdaItemCollection, DimensionizedCdaItem } from './types';
+import { CdaItemCollection, DimensionizedCdaItem } from './types';
 import { parseDimensions } from './utils/dimensionParser';
 
 const infoContainer: HTMLDivElement = document.getElementById("info")! as HTMLDivElement;
