@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { Material, Mesh, MeshBasicMaterial, Object3D, Raycaster, Vector3 } from "three";
 import { DimensionizedCdaItem, ItemDimensions } from "../types";
-import { animateControls, createControls } from "./controls";
+import { animateControls, controlProperties, createControls } from "./controls";
 import { calcSurfaceArea, getWebGLErrorMessage, isWebGL2Available, makeTextSprite } from "./utils";
 import { Pane } from 'tweakpane';
 
@@ -59,6 +59,12 @@ const initPane = () => {
 
     pane.addInput(PROPS, "highlightColor", {
         view: 'color'
+    });
+
+    pane.addInput(controlProperties, "movementSpeed", {
+        view: "number",
+        min: 0,
+        max: 100
     });
 };
 

@@ -60,7 +60,7 @@ const onKeyUp = (event: KeyboardEvent)  => {
 };
 
 export let controlProperties: ControlProperties = {
-    movementSpeed: 400.0
+    movementSpeed: 20.0
 };
 
 export const animateControls = () => {
@@ -74,8 +74,8 @@ export const animateControls = () => {
         direction.x = Number(moveRight) - Number(moveLeft);
         direction.normalize();
 
-        if (moveForward || moveBackward) velocity.z -= direction.z * controlProperties.movementSpeed * delta;
-        if (moveLeft || moveRight) velocity.x -= direction.x * controlProperties.movementSpeed * delta;
+        if (moveForward || moveBackward) velocity.z -= direction.z * Math.pow(controlProperties.movementSpeed, 2) * delta;
+        if (moveLeft || moveRight) velocity.x -= direction.x * Math.pow(controlProperties.movementSpeed, 2) * delta;
 
         controls.moveRight(-velocity.x * delta);
         controls.moveForward(-velocity.z * delta);
