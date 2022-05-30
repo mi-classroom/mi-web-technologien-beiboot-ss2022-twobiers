@@ -1,14 +1,14 @@
 import { Pane } from "tweakpane";
 import { controlProperties } from "./controls";
 import { artworkProperties } from "./objects/artwork";
-import { toStart } from "./objects/scene";
+import { resetCamera } from "./objects/scene";
 
 const pane = new Pane();
 
 const resetBtn = pane.addButton({
     title: "Back to start"
 });
-resetBtn.on("click", toStart);
+resetBtn.on("click", resetCamera);
 
 pane.addInput(artworkProperties, "highlightColor", {
     view: 'color'

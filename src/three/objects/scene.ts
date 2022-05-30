@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { createControls } from "../controls";
 import { crosshair } from "./crosshair";
 
 export const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -21,12 +22,12 @@ scene.add(new THREE.AxesHelper(100));
 floor.rotateX(-Math.PI / 2);
 scene.add(floor);
 
-export const toStart = () => {
+export const resetCamera = () => {
     camera.position.set(-10, 10, -10);
     camera.rotation.set(0, 180 * Math.PI / 180, 0); // Turn aroundas
 };
 
-toStart();
+resetCamera();
 
 camera.aspect = window.innerWidth / window.innerHeight;
 camera.updateProjectionMatrix();
@@ -49,3 +50,6 @@ window.addEventListener("resize", () => {
 const render = () => {
     renderer.render(scene, camera);
 };
+
+const controls = createControls(camera, renderer.domElement);
+scene.add(controls.getObject());

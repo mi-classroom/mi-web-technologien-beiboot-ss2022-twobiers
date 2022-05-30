@@ -1,12 +1,11 @@
 import * as THREE from "three";
 import { Raycaster } from "three";
 import { DimensionizedCdaItem } from "../types";
-import { animateControls, createControls } from "./controls";
+import { animateControls } from "./controls";
 import { getWebGLErrorMessage, isWebGL2Available, makeTextSprite } from "./utils";
 import { ArtworkObject, Artwork3DObject } from "./objects/artwork";
 import { camera, floor, renderer, scene } from "./objects/scene";
 import pane from "./pane";
-
 
 if(!isWebGL2Available()) {
     document.body.appendChild(getWebGLErrorMessage());
@@ -116,10 +115,6 @@ export const setArtworks = async (artworks: DimensionizedCdaItem[]) => {
 };
 
 export const getSceneCanvas = (): HTMLCanvasElement => {
-    const controls = createControls(camera, renderer.domElement);
-    scene.add(controls.getObject());
-
     animate();
-
     return renderer.domElement;
 };
