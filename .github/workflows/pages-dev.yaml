@@ -17,7 +17,7 @@ jobs:
       - run: npm ci
       - run: npm run build:prod
         env:
-          VITE_BASE_URL: /mi-web-technologien-beiboot-ss2022-twobiers/dev
+          VITE_BASE_URL: /mi-web-technologien-beiboot-ss2022-twobiers/dev/
       
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.3.0
