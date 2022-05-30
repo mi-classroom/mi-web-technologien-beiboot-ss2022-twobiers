@@ -9,6 +9,18 @@ body {
     margin: 0;
 }
 
+#controls {
+    position: absolute;
+    bottom: 0px;
+    padding: 1rem;
+    z-index: 100;
+    margin: 0 auto;
+    background-color: rgba($color: $dark, $alpha: 0.5);
+    b {
+        color: $accent-dark;
+    }
+}
+
 #info {
     position: absolute;
     top: 0px;
