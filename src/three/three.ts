@@ -62,11 +62,6 @@ const groupArtworkObjectsByDating = (objects: ArtworkObject[]): Record<number, A
 const createArtworkModelGroupOfYear = (year: number, objects: ArtworkObject[]): THREE.Group => {
     const group = new THREE.Group();
 
-    // Place a year indicator at the front
-    const label = makeTextSprite(`${year}`, { fontsize: 86 });
-    label.position.set(0, 20, 0);
-    group.add(label);
-
     // Artworks will be placed NEXT to each other. 
     for(const element of objects) {
         const artwork = element;
@@ -79,7 +74,11 @@ const createArtworkModelGroupOfYear = (year: number, objects: ArtworkObject[]): 
         artwork.position.set(20, artworkBoxSize.y / 2, groupBoxSize.z + (artworkBoxSize.x / 2));
         
         group.add(artwork);
-    }
+    }    
+    // Place a year indicator on top
+    const label = makeTextSprite(`${year}`, { fontsize: 50 });
+    label.position.set(20, 20, 0);
+    group.add(label);
 
     return group;
 };
