@@ -3,11 +3,10 @@ import { Material, Mesh, MeshBasicMaterial, Object3D, Raycaster, Scene, Vector3 
 import { DimensionizedCdaItem, ItemDimensions } from "../types";
 import { animateControls, controlProperties, createControls } from "./controls";
 import { calcSurfaceArea, getWebGLErrorMessage, isWebGL2Available, makeTextSprite } from "./utils";
-import { Pane } from 'tweakpane';
 import { crosshair } from "./objects/crosshair";
 import { ArtworkObject, isArtworkObject, artworkProperties, Artwork3DObject } from "./objects/artwork";
-import { floor, scene } from "./objects/scene";
-
+import { camera, floor, renderer, scene } from "./objects/scene";
+import pane from "./pane";
 
 
 if(!isWebGL2Available()) {
@@ -15,67 +14,11 @@ if(!isWebGL2Available()) {
     throw new Error("WebGL is not supported");
 }
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-
-// Add Floor
+const _pane = pane; // Keep to show the pane
 
 const raycaster = new THREE.Raycaster();
 
-const pane = new Pane();
 let artworkObjects: Artwork3DObject[] = [];
-
-const toStart = () => {
-    camera.position.set(-10, 10, -10);
-    camera.rotation.set(0, 180 * Math.PI / 180, 0); // Turn aroundas
-};
-
-const initPane = () => {
-    const resetBtn = pane.addButton({
-        title: "Back to start"
-    });
-    resetBtn.on("click", toStart);
-
-    pane.addInput(artworkProperties, "highlightColor", {
-        view: 'color'
-    });
-
-    pane.addInput(controlProperties, "movementSpeed", {
-        view: "number",
-        min: 0,
-        max: 100
-    });
-};
-
-const initScene = () => {
-
-    toStart();
-
-    camera.aspect = window.innerWidth / window.innerHeight;
-	camera.updateProjectionMatrix();
-    
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
-
-
-
-
-    // Crosshair
-    camera.add(crosshair);
-
-    window.addEventListener("resize", () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-		camera.updateProjectionMatrix();
-
-		renderer.setSize( window.innerWidth, window.innerHeight );
-        render();
-    }, false);
-};
-
-const render = () => {
-    renderer.render(scene, camera);
-};
 
 const highlightIntersectedArtworks = (rc: Raycaster) => {
     const intersectedArtworks: THREE.Intersection<Artwork3DObject>[] = (rc.intersectObjects(artworkObjects, false) as any as THREE.Intersection<Artwork3DObject>[])
@@ -173,10 +116,6 @@ export const setArtworks = async (artworks: DimensionizedCdaItem[]) => {
 };
 
 export const getSceneCanvas = (): HTMLCanvasElement => {
-    initScene();
-
-    initPane();
-
     const controls = createControls(camera, renderer.domElement);
     scene.add(controls.getObject());
 
