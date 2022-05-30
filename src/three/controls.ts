@@ -5,10 +5,16 @@ let moveForward = false;
 let moveBackward = false;
 let moveLeft = false;
 let moveRight = false;
+
 const velocity = new THREE.Vector3();
 const direction = new THREE.Vector3();
 let controls: PointerLockControls; 
+
 const clock = new THREE.Clock(true);
+
+type ControlProperties = {
+    movementSpeed: number;
+}
 
 const onKeyDown = (event: KeyboardEvent)  => {
     switch (event.code) {
@@ -53,6 +59,10 @@ const onKeyUp = (event: KeyboardEvent)  => {
     }
 };
 
+export let controlProperties: ControlProperties = {
+    movementSpeed: 400.0
+};
+
 export const animateControls = () => {
     if(controls.isLocked) {
         const delta = clock.getDelta();
@@ -64,15 +74,15 @@ export const animateControls = () => {
         direction.x = Number(moveRight) - Number(moveLeft);
         direction.normalize();
 
-        if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
-        if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;
+        if (moveForward || moveBackward) velocity.z -= direction.z * controlProperties.movementSpeed * delta;
+        if (moveLeft || moveRight) velocity.x -= direction.x * controlProperties.movementSpeed * delta;
 
         controls.moveRight(-velocity.x * delta);
         controls.moveForward(-velocity.z * delta);
     }
-};
+}
 
-export const initControls = (camera: THREE.Camera, element: HTMLElement): PointerLockControls => {
+export const createControls = (camera: THREE.Camera, element: HTMLElement): PointerLockControls => {
     controls = new PointerLockControls(camera, element);
 
     element.addEventListener("click", () => {

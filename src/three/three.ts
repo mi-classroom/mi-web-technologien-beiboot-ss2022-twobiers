@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { Material, Mesh, MeshBasicMaterial, Object3D, Raycaster, Vector3 } from "three";
 import { DimensionizedCdaItem, ItemDimensions } from "../types";
-import { animateControls, initControls } from "./controls";
+import { animateControls, createControls } from "./controls";
 import { calcSurfaceArea, getWebGLErrorMessage, isWebGL2Available, makeTextSprite } from "./utils";
 import { Pane } from 'tweakpane';
 
@@ -269,7 +269,7 @@ export const getSceneCanvas = (): HTMLCanvasElement => {
 
     initPane();
 
-    const controls = initControls(camera, renderer.domElement);
+    const controls = createControls(camera, renderer.domElement);
     scene.add(controls.getObject());
 
     animate();

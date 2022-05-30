@@ -17,7 +17,11 @@ interface TextSpriteProperties {
     textColor?: Color;
 };
 
-export const isWebGL2Available = () => {
+/**
+ * Checks whether WebGL 2 is available in the current browser
+ * @returns true if available
+ */
+export const isWebGL2Available = (): boolean => {
     try {
         const canvas = document.createElement('canvas');
         return !! (window.WebGL2RenderingContext && canvas.getContext('webgl2'));
@@ -26,11 +30,18 @@ export const isWebGL2Available = () => {
     }
 };
 
+/**
+ * Trims different kinds of braces away from a given string.
+ * Does not mutate the string.
+ */
 export const trimBraces = (str: string): string => {
     return str.split(/[\[\(]/g)[0];
 };
 
-export const getWebGLErrorMessage = () => {
+/**
+ * Creates HTMLElement with an error message about missing WebGL support
+ */
+export const getWebGLErrorMessage = (): HTMLDivElement => {
 		const message = 'Your browser does not seem to support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" style="color:#000">WebGL</a>';
 
 		const element = document.createElement( 'div' );
@@ -50,7 +61,13 @@ export const getWebGLErrorMessage = () => {
 		return element;
 };
 
-export const makeTextSprite = (message: string, properties: TextSpriteProperties = {}) => {
+/**
+ * Creates a three.js 2D text sprite 
+ * @param message text that should be displayed in the sprite
+ * @param properties customizations
+ * @returns text sprite
+ */
+export const makeTextSprite = (message: string, properties: TextSpriteProperties = {}): THREE.Sprite => {
     const fontface = properties.fontface ? properties.fontface : "Courier New";
     const fontsize = properties.fontsize ? properties.fontsize : 18;
     const borderThickness = properties.borderThickness ? properties.borderThickness : 4;
@@ -75,6 +92,11 @@ export const makeTextSprite = (message: string, properties: TextSpriteProperties
     return sprite;
 };
 
+/**
+ * Calculates the surface area of given dimensions
+ * @param dimension dimensions
+ * @returns surface area
+ */
 export const calcSurfaceArea = (dimension: ItemDimensions): number => {
     switch(dimension.shape) {
         case "circle":
