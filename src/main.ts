@@ -7,7 +7,8 @@ import { parseDimensions } from './utils/dimensionParser';
 
 const infoContainer: HTMLDivElement = document.getElementById("info")! as HTMLDivElement;
 
-const showCanvas = () => {
+const showCanvas = async () => {
+    await loadArtworksIntoScene();
     document.body.appendChild(getSceneCanvas());
 }
 
@@ -35,7 +36,7 @@ const renderUploadBanner = () => {
             console.log(`Successfully saved ${result.length} items in IndexDB`);
             uploadBanner.style.display = "none";
             
-            showCanvas();
+            await showCanvas();
         }
     }, false);
     const fileUploadButton = document.createElement("input");
@@ -64,29 +65,7 @@ const init = async() => {
     if(!(await hasAnyItems())) {
         renderUploadBanner();
     } else {
-        const bestOfItems = await getBestOfItems();
-        // TODO: We could perform a migration in the IndexedDB and safe the parsed dimensions there.
-        //       Leave it for the moment and see whether it works anyway.
-        const dimensionizedBestOfItems = bestOfItems.map(item => {
-            const dimensionized: DimensionizedCdaItem = {
-                ...item,
-                dimensions: parseDimensions(item.dimensions)
-            }
-            if(Object.values(dimensionized.dimensions.dimension).some(v => Number.isNaN(v))) {
-                console.warn("There is a NaN value in parsed dimensions. Check your parser");
-            }
-            if(item.dating.begin === 1530) {
-                console.log({
-                    d1: item,
-                    d2: dimensionized.dimensions
-                });
-            }
-            return dimensionized;
-        });
-
-        showCanvas();
-
-        await setArtworks(dimensionizedBestOfItems);
+        await showCanvas();
     }
 };
 
@@ -120,6 +99,30 @@ const removeArtworkInfo = (artwork: DimensionizedCdaItem) => {
     const existing = infoContainer.querySelector(`div[artwork-id="${id}"`);
     existing?.remove();
 };
+
+const loadArtworksIntoScene = async() => {
+    const bestOfItems = await getBestOfItems();
+    // TODO: We could perform a migration in the IndexedDB and safe the parsed dimensions there.
+    //       Leave it for the moment and see whether it works anyway.
+    const dimensionizedBestOfItems = bestOfItems.map(item => {
+        const dimensionized: DimensionizedCdaItem = {
+            ...item,
+            dimensions: parseDimensions(item.dimensions)
+        }
+        if(Object.values(dimensionized.dimensions.dimension).some(v => Number.isNaN(v))) {
+            console.warn("There is a NaN value in parsed dimensions. Check your parser");
+        }
+        if(item.dating.begin === 1530) {
+            console.log({
+                d1: item,
+                d2: dimensionized.dimensions
+            });
+        }
+        return dimensionized;
+    });
+
+    await setArtworks(dimensionizedBestOfItems)
+}
 
 init()
     .then(() => console.log("Initilization completed"));
