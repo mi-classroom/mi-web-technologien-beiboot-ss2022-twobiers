@@ -115,7 +115,7 @@ const loadArtworksIntoScene = async() => {
         return dimensionized;
     });
 
-    await setArtworks(dimensionizedBestOfItems)
+    await setArtworks(dimensionizedBestOfItems);
 }
 
 init()

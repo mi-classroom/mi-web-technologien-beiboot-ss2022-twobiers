@@ -3,7 +3,7 @@ import { Raycaster } from "three";
 import { DimensionizedCdaItem } from "../types";
 import { animateControls } from "./controls";
 import { getWebGLErrorMessage, isWebGL2Available, makeTextSprite } from "./utils";
-import { ArtworkObject, Artwork3DObject } from "./objects/artwork";
+import { Artwork3DObject } from "./objects/artwork";
 import { camera, floor, renderer, scene } from "./objects/scene";
 import pane from "./pane";
 

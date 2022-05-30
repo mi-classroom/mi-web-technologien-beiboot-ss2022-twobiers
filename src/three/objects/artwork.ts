@@ -2,21 +2,13 @@ import * as THREE from "three";
 import { BufferGeometry, Mesh, MeshBasicMaterial, Object3D } from "three";
 import { DimensionizedCdaItem, ItemDimensions } from "../../types";
 
-// TODO: Proper typing
 type ArtworkUserData = { 
     year: number,
     rawItem: DimensionizedCdaItem 
 };
 
-export type ArtworkObject = Mesh & { 
-    userData: ArtworkUserData;
-    isHighlighted: boolean;
-    highlight(): void;
-    unhighlight(): void;
-};
-
 // Very trivial type guard, but sufficient
-export const isArtworkObject = (object: Object3D) : object is ArtworkObject => {
+export const isArtworkObject = (object: Object3D) : object is Artwork3DObject => {
     return (object.name === "artwork");
 }
 
