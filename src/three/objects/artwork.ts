@@ -22,7 +22,7 @@ export const isArtworkObject = (object: Object3D) : object is ArtworkObject => {
 
 export const artworkProperties = {
     highlightColor: 0x8cff32,
-    scale: 0.1
+    scale: 0.1 // We assume that 1 unit is 1m
 };
 
 const createGeometry = (dimensions: ItemDimensions): THREE.BufferGeometry => {

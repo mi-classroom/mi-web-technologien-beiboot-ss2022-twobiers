@@ -50,30 +50,32 @@ const animate = () => {
 
 const createArtworkObjects = (artworks: DimensionizedCdaItem[]): Promise<Artwork3DObject[]> => Promise.all(artworks.map(art => Artwork3DObject.buildArtworkObject(art)));
 
-const groupArtworkObjectsByDating = (objects: ArtworkObject[]): Record<number, ArtworkObject[]> => objects.reduce((acc, curr) => {
+const groupArtworkObjectsByDating = (objects: Artwork3DObject[]): Record<number, Artwork3DObject[]> => objects.reduce((acc, curr) => {
     const year = curr.userData.year;
     if(!acc[year]) {
         acc[year] = []
     }
     acc[year].push(curr);
     return acc;
-}, {} as Record<number, ArtworkObject[]>);
+}, {} as Record<number, Artwork3DObject[]>);
 
-const createArtworkModelGroupOfYear = (year: number, objects: ArtworkObject[]): THREE.Group => {
+const createArtworkModelGroupOfYear = (year: number, objects: Artwork3DObject[]): THREE.Group => {
     const group = new THREE.Group();
-
+    const artworkBox = new THREE.Box3();
+    const groupBox = new THREE.Box3();
+    const artworkBoxSize = new THREE.Vector3();
+    const groupBoxSize = new THREE.Vector3();
     // Artworks will be placed NEXT to each other. 
     for(const element of objects) {
-        const artwork = element;
-        const artworkBox = new THREE.Box3().setFromObject(artwork);
-        const groupBox = new THREE.Box3().setFromObject(group);
-        const artworkBoxSize = artworkBox.getSize(new THREE.Vector3());
-        const groupBoxSize = groupBox.getSize(new THREE.Vector3());
+        artworkBox.setFromObject(element);
+        groupBox.setFromObject(group);
+        artworkBox.getSize(artworkBoxSize);
+        groupBox.getSize(groupBoxSize);
         
-        artwork.rotateY(-90 * Math.PI / 180);
-        artwork.position.set(20, artworkBoxSize.y / 2, groupBoxSize.z + (artworkBoxSize.x / 2));
+        element.rotateY(-90 * Math.PI / 180);
+        element.position.set(20, artworkBoxSize.y / 2, groupBoxSize.z + (artworkBoxSize.x / 2));
         
-        group.add(artwork);
+        group.add(element);
     }    
     // Place a year indicator on top
     const label = makeTextSprite(`${year}`, { fontsize: 50 });
@@ -97,13 +99,15 @@ export const setArtworks = async (artworks: DimensionizedCdaItem[]) => {
     const modeledGroups = Object.entries(groups).map(([year, arr]) => createArtworkModelGroupOfYear(Number(year), arr));
 
     let currentOffset = 0;
+    const groupBox = new THREE.Box3();
+    const groupBoxSize = new THREE.Vector3();
     for(const element of modeledGroups) {
         const group = element;
 
         group.position.set(group.position.x, group.position.y, currentOffset);
 
-        const groupBox = new THREE.Box3().setFromObject(group);
-        const groupBoxSize = groupBox.getSize(new THREE.Vector3());
+        groupBox.setFromObject(group);
+        groupBox.getSize(groupBoxSize);
         currentOffset += groupBoxSize.z + 20;
 
         const helper = new THREE.BoxHelper(group, 0xff0000);
