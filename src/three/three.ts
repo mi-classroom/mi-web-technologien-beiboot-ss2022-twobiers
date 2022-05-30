@@ -1,22 +1,14 @@
 import * as THREE from "three";
-import { Material, Mesh, MeshBasicMaterial, Object3D, Raycaster, Vector3 } from "three";
+import { Material, Mesh, MeshBasicMaterial, Object3D, Raycaster, Scene, Vector3 } from "three";
 import { DimensionizedCdaItem, ItemDimensions } from "../types";
 import { animateControls, controlProperties, createControls } from "./controls";
 import { calcSurfaceArea, getWebGLErrorMessage, isWebGL2Available, makeTextSprite } from "./utils";
 import { Pane } from 'tweakpane';
-import { Crosshair } from "./objects/crosshair";
+import { crosshair } from "./objects/crosshair";
+import { ArtworkObject, isArtworkObject, artworkProperties, Artwork3DObject } from "./objects/artwork";
+import { floor, scene } from "./objects/scene";
 
-// TODO: Proper typing
-type ArtworkUserData = { 
-    year: number,
-    rawItem: DimensionizedCdaItem 
-};
-type ArtworkObject = Mesh & { userData: ArtworkUserData };
 
-// Very trivial type guard, but sufficient
-const isArtworkObject = (object: Object3D) : object is ArtworkObject => {
-    return (typeof object.userData.year === "number");
-}
 
 if(!isWebGL2Available()) {
     document.body.appendChild(getWebGLErrorMessage());
@@ -26,26 +18,13 @@ if(!isWebGL2Available()) {
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const scene = new THREE.Scene();
 
 // Add Floor
-const floorGeometry = new THREE.PlaneBufferGeometry(1000, 1000, 100, 100);
-const floorMaterial = new THREE.MeshBasicMaterial( { 
-    color: 0x565656
-} );
-const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 
 const raycaster = new THREE.Raycaster();
 
 const pane = new Pane();
-const PROPS = {
-    highlightColor: 0x8cff32
-};
-
-// object where artworks added to the scene will be saved with their dating as key.
-//const artworkObjects: Record<number, Object3D[]> = {};
-
-scene.add(new THREE.AxesHelper(100));
+let artworkObjects: Artwork3DObject[] = [];
 
 const toStart = () => {
     camera.position.set(-10, 10, -10);
@@ -58,7 +37,7 @@ const initPane = () => {
     });
     resetBtn.on("click", toStart);
 
-    pane.addInput(PROPS, "highlightColor", {
+    pane.addInput(artworkProperties, "highlightColor", {
         view: 'color'
     });
 
@@ -79,14 +58,10 @@ const initScene = () => {
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
 
-    scene.background = new THREE.Color( 0x878787 );
-	scene.fog = new THREE.Fog( 0x878787, 0, 750 );
 
-    floor.rotateX(-Math.PI / 2);
-    scene.add(floor);
+
 
     // Crosshair
-    const crosshair = Crosshair;
     camera.add(crosshair);
 
     window.addEventListener("resize", () => {
@@ -102,49 +77,18 @@ const render = () => {
     renderer.render(scene, camera);
 };
 
-let highlightedArtworks: ArtworkObject[] = [];
-
-const highlightArtwork = (artwork: ArtworkObject) => {
-    console.log(artwork);
-    // TODO: type this
-    if(artwork.material instanceof MeshBasicMaterial) {
-        artwork.material.color.set(PROPS.highlightColor);
-    }
-    highlightedArtworks.push(artwork);
-    const highlightEvent = new CustomEvent("highlight", { detail: artwork.userData.rawItem })
-    document.dispatchEvent(highlightEvent);
-};
-
-const unhighlightArtwork = (artwork: ArtworkObject) => {
-    // TODO: type this
-    if(artwork.material instanceof MeshBasicMaterial) {
-        artwork.material.color.set(0xffffff);
-    }
-    highlightedArtworks.splice(highlightedArtworks.indexOf(artwork));
-    const highlightEvent = new CustomEvent("unhighlight", { detail: artwork.userData.rawItem })
-    document.dispatchEvent(highlightEvent);
-};
-
-const isHighlighted = (artwork: ArtworkObject) => highlightedArtworks.some(aw => aw === artwork);
-
 const highlightIntersectedArtworks = (rc: Raycaster) => {
-    const intersects = rc.intersectObjects( scene.children );
-    const artworkIntersections = intersects.filter(i => isArtworkObject(i.object));
-    const isIntersected = (artwork: ArtworkObject) => artworkIntersections.some(intersection => intersection.object === artwork && intersection.distance < 100);
-    for(const artworkIntersection of artworkIntersections) {
-        const object = artworkIntersection.object as ArtworkObject;
-        
-        if(!isHighlighted(object) && isIntersected(object)) {
-            highlightArtwork(object);
-        }
+    const intersectedArtworks: THREE.Intersection<Artwork3DObject>[] = (rc.intersectObjects(artworkObjects, false) as any as THREE.Intersection<Artwork3DObject>[])
+        .filter(intersection => intersection.distance < 100);
+    for(const intersection of intersectedArtworks) {
+        intersection.object.highlight();
     }
 
     // Unhighlight all "pending" - artworks not currently intersected, but highlighted
-    const pendingHighlights = highlightedArtworks
-        .filter(aw => !isIntersected(aw))
-        .filter(aw => isHighlighted(aw));
-    for(const pendingHighlight of pendingHighlights) {
-        unhighlightArtwork(pendingHighlight);
+    const pendingHightlights = artworkObjects.filter(aw => aw.isHighlighted)
+        .filter(aw => !intersectedArtworks.some(i => i.object === aw));
+    for(const pending of pendingHightlights) {
+        pending.unhighlight();
     }
 };
 
@@ -160,42 +104,12 @@ const animate = () => {
     highlightIntersectedArtworks(raycaster);
 
     renderer.render( scene, camera );
-
 };
 
-const createGeometry = (dimensions: ItemDimensions): THREE.BufferGeometry => {
-    switch(dimensions.shape) {
-        case "circle":
-            return new THREE.CircleGeometry(dimensions.dimension.diameter / 2, 32);
-        case "rectangle":
-            return new THREE.BoxGeometry(dimensions.dimension.width, dimensions.dimension.height, dimensions.dimension.depth);
-    }
-};
-
-const createArtworkMesh = async (artwork: DimensionizedCdaItem): Promise<ArtworkObject> => {
-    const geometry = createGeometry(artwork.dimensions);
-    const url = artwork.images.overall.images[0].sizes.medium.src.replaceAll("imageserver-2022", "data-proxy/image.php?subpath=");
-    const texture = await new THREE.TextureLoader().loadAsync(url);
-    const material = new THREE.MeshBasicMaterial({ 
-        color: 0xFFFFFF,
-        map: texture
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-
-    const year = artwork.dating.begin;
-    const userData: ArtworkUserData = {
-        year,
-        rawItem: artwork
-    } as ArtworkUserData;
-    mesh.userData = userData;
-
-    return mesh as any as ArtworkObject;
-};
-
-const createArtworkObjects = (artworks: DimensionizedCdaItem[]): Promise<ArtworkObject[]> => Promise.all(artworks.map(art => createArtworkMesh(art)));
+const createArtworkObjects = (artworks: DimensionizedCdaItem[]): Promise<Artwork3DObject[]> => Promise.all(artworks.map(art => Artwork3DObject.buildArtworkObject(art)));
 
 const groupArtworkObjectsByDating = (objects: ArtworkObject[]): Record<number, ArtworkObject[]> => objects.reduce((acc, curr) => {
-    const year = (curr.userData as ArtworkUserData).year;
+    const year = curr.userData.year;
     if(!acc[year]) {
         acc[year] = []
     }
@@ -233,7 +147,7 @@ export const setArtworks = async (artworks: DimensionizedCdaItem[]) => {
     artworks = artworks.sort((a, b) => a.dating.begin - b.dating.begin);
 
     // First, we create all meshes from the artworks
-    const artworkObjects = await createArtworkObjects(artworks);
+    artworkObjects = await createArtworkObjects(artworks);
 
     // Next, we group them by their particular dating
     const groups = groupArtworkObjectsByDating(artworkObjects);

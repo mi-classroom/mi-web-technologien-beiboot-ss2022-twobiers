@@ -14,4 +14,4 @@ const cursorMaterial = new THREE.MeshBasicMaterial({ color: "white" });
 const cursor = new THREE.Mesh(cursorGeometry, cursorMaterial);
 cursor.position.z = -cameraMin * 50;
 
-export const Crosshair = cursor;
+export const crosshair = cursor;
