@@ -5,25 +5,37 @@ import { resetCamera } from "./objects/scene";
 
 const pane = new Pane();
 
-const resetBtn = pane.addButton({
+const highlightFolder = pane.addFolder({
+    title: "Highlight",
+    expanded: true
+});
+highlightFolder.addInput(artworkProperties, "enableVisualHighlight", {
+    label: "Visual Highlighting"
+});
+
+highlightFolder.addInput(artworkProperties, "highlightColor", {
+    view: "color",
+    label: "Highlight Color"
+});
+
+const controlFolder = pane.addFolder({
+    title: "Controls",
+    expanded: true
+});
+const resetBtn = controlFolder.addButton({
     title: "Back to start"
 });
 resetBtn.on("click", resetCamera);
-
-pane.addInput(artworkProperties, "enableVisualHighlight");
-
-pane.addInput(artworkProperties, "highlightColor", {
-    view: 'color'
-});
-
-pane.addInput(controlProperties, "movementSpeed", {
+controlFolder.addInput(controlProperties, "movementSpeed", {
     view: "number",
+    label: "Movement Speed",
     min: 0,
     max: 100
 });
 
-pane.addInput(controlProperties, "zoomAmount", {
+controlFolder.addInput(controlProperties, "zoomAmount", {
     view: "number",
+    label: "Zoom Level",
     min: 0,
     max: 100
 });
