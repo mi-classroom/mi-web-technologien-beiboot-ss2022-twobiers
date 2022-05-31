@@ -33,7 +33,7 @@ const highlightIntersectedArtworks = (rc: Raycaster) => {
 
     // Unhighlight all "pending" - artworks not currently intersected, but highlighted
     const pendingHightlights = artworkObjects.filter(aw => aw.isHighlighted)
-        .filter(aw => !intersectedArtworks.some(i => i.object === aw));
+        .filter(aw => !intersectedArtworks.some(i => i.object === aw) || nearest.object !== aw);
     for(const pending of pendingHightlights) {
         pending.unhighlight();
     }
