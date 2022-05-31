@@ -27,6 +27,7 @@
     "vite": "^2.9.5"
   },
   "dependencies": {
+    "@tweakpane/plugin-essentials": "^0.1.4",
     "idb": "^7.0.1",
     "three": "^0.140.2",
     "tweakpane": "^3.0.8"

@@ -5,7 +5,7 @@ import { animateControls } from "./controls";
 import { getWebGLErrorMessage, isWebGL2Available } from "./utils";
 import { Artwork3DObject } from "./objects/artwork";
 import { camera, floor, renderer, scene } from "./objects/scene";
-import pane from "./pane";
+import pane, { fpsGraph } from "./pane";
 import { createArtworkModelGroupOfYear } from "./objects/artworkGroup";
 
 if(!isWebGL2Available()) {
@@ -39,6 +39,9 @@ const highlightIntersectedArtworks = (rc: Raycaster) => {
 };
 
 const animate = () => {
+    //@ts-ignore
+    fpsGraph.begin();
+    
     requestAnimationFrame( animate );
 
     animateControls();
@@ -50,6 +53,9 @@ const animate = () => {
     highlightIntersectedArtworks(raycaster);
 
     renderer.render( scene, camera );
+    
+    //@ts-ignore
+    fpsGraph.end();
 };
 
 const createArtworkObjects = (artworks: DimensionizedCdaItem[]) => Promise.all(artworks.map(art => Artwork3DObject.buildArtworkObject(art)));
