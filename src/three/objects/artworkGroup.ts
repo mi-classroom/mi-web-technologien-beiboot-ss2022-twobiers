@@ -3,19 +3,15 @@ import { makeTextSprite } from "../utils";
 import { Artwork3DObject } from "./artwork";
 
 const gap = 10;
+const eyeHeight = 1.7;
+const elevate = 1;
 
 export const createArtworkModelGroupOfYear = (year: number, objects: Artwork3DObject[]): THREE.Group => {
     const group = new THREE.Group();
     let offsetX = 0;
     let offsetZ = 0;
     // Artworks will be placed NEXT to each other. 
-    for(const element of objects) {
-        // TODO: maybe create methods within the object
-        if(element.geometry.boundingBox === null) {
-            element.geometry.computeBoundingBox();
-        }
-        const artworkBox = element.geometry.boundingBox!;
-        
+    for(const element of objects) {        
         // We want to assure, that each artwork has a deterministic location on the y axis
         // at a multiple of 10. This would give us a bit of consistency although it is not really necessary.
         // Because we don't want artworks really close to each other, we take 1/4 as a limit for padding.
@@ -26,7 +22,8 @@ export const createArtworkModelGroupOfYear = (year: number, objects: Artwork3DOb
         }
 
         const x = offsetX + padding;
-        const y =  (0 - artworkBox.min.y) * element.scale.y; // On the ground...
+        // Place every artwork centered on eye height, but if it's to large we just pad from the bottom and leave it as it is
+        const y = (element.height / 2) > eyeHeight ? (element.height / 2) * 10 + elevate : eyeHeight * 10;
         const z = 0.01 + offsetZ; // We increates z each time a bit to prevent flickering. 
         element.position.set(x, y , z);
 
