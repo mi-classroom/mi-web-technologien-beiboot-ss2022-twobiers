@@ -72,14 +72,16 @@ const createArtworkModelGroupOfYear = (year: number, objects: Artwork3DObject[])
         artworkBox.getSize(artworkBoxSize);
         groupBox.getSize(groupBoxSize);
         
-        element.rotateY(-90 * Math.PI / 180);
-        element.position.set(20, artworkBoxSize.y / 2, groupBoxSize.z + (artworkBoxSize.x / 2));
+        const x = groupBoxSize.x + artworkBoxSize.x;
+        const y = artworkBoxSize.y / 2; // On ground
+        const z = 0; // We don't need z as we're just two-dimensional in a group. The whole group will be moved on the z-axis
+        element.position.set(x, y , z);
         
         group.add(element);
-    }    
+    }
     // Place a year indicator on top
     const label = makeTextSprite(`${year}`, { fontsize: 50 });
-    label.position.set(20, 20, 0);
+    label.position.set(0, 20, 0);
     group.add(label);
 
     return group;
@@ -103,11 +105,12 @@ export const setArtworks = async (artworks: DimensionizedCdaItem[]) => {
     const groupBoxSize = new THREE.Vector3();
     for(const element of modeledGroups) {
         const group = element;
-
-        group.position.set(group.position.x, group.position.y, currentOffset);
-
         groupBox.setFromObject(group);
         groupBox.getSize(groupBoxSize);
+
+        group.position.set(0, group.position.y, currentOffset);
+        group.rotation.set(0, 180 * Math.PI / 180, 0); // Flip the group to right align it on the z-axis. Not really smart but pragmatic
+
         currentOffset += groupBoxSize.z + 20;
 
         const helper = new THREE.BoxHelper(group, 0xff0000);
