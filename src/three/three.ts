@@ -51,14 +51,31 @@ const animate = () => {
 
 const createArtworkObjects = (artworks: DimensionizedCdaItem[]) => Promise.all(artworks.map(art => Artwork3DObject.buildArtworkObject(art)));
 
-const groupArtworkObjectsByDating = (objects: Artwork3DObject[]) => objects.reduce<Record<number, Artwork3DObject[]>>((acc, curr) => {
-    const year = curr.userData.year;
-    if(!acc[year]) {
-        acc[year] = []
+const groupArtworkObjectsByDating = (objects: Artwork3DObject[], preserveGaps?: boolean) => {
+    const grouped = objects.reduce<Record<number, Artwork3DObject[]>>((acc, curr) => {
+        const year = curr.userData.year;
+        if(!acc[year]) {
+            acc[year] = []
+        }
+        acc[year].push(curr);
+        return acc;
+    }, {});
+
+    if(!preserveGaps) {
+        return grouped;
     }
-    acc[year].push(curr);
-    return acc;
-}, {});
+
+    const years = Object.keys(grouped).map(year => Number(year));
+    const minYear = Math.min(...years);
+    const maxYear = Math.max(...years);
+    for(let i = minYear; i < maxYear; ++i) {
+        if(!grouped[i]) {
+            grouped[i] = [];
+        }
+    }
+
+    return grouped;
+}
 
 
 export const setArtworks = async (artworks: DimensionizedCdaItem[]) => {
@@ -69,7 +86,7 @@ export const setArtworks = async (artworks: DimensionizedCdaItem[]) => {
     artworkObjects = await createArtworkObjects(artworks);
 
     // Next, we group them by their particular dating
-    const groups = groupArtworkObjectsByDating(artworkObjects);
+    const groups = groupArtworkObjectsByDating(artworkObjects, true);
 
     // We create modeled groups
     const modeledGroups = Object.entries(groups).map(([year, arr]) => createArtworkModelGroupOfYear(Number(year), arr));
