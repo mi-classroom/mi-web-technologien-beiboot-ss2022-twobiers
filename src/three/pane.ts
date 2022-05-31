@@ -10,6 +10,8 @@ const resetBtn = pane.addButton({
 });
 resetBtn.on("click", resetCamera);
 
+pane.addInput(artworkProperties, "enableVisualHighlight");
+
 pane.addInput(artworkProperties, "highlightColor", {
     view: 'color'
 });

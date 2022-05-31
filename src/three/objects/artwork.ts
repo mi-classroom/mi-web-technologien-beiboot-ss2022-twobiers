@@ -13,6 +13,7 @@ export const isArtworkObject = (object: Object3D) : object is Artwork3DObject =>
 }
 
 export const artworkProperties = {
+    enableVisualHighlight: true,
     highlightColor: 0x8cff32,
     scale: 0.1 // We assume that 1 unit is 1m
 };
@@ -55,8 +56,10 @@ export class Artwork3DObject extends Mesh {
     }
 
     highlight(): void {
-        if(this.material instanceof MeshBasicMaterial) {
-            this.material.color.set(artworkProperties.highlightColor);
+        if(artworkProperties.enableVisualHighlight) {
+            if(this.material instanceof MeshBasicMaterial) {
+                this.material.color.set(artworkProperties.highlightColor);
+            }
         }
         this.isHighlighted = true;
         const highlightEvent = new CustomEvent("highlight", { detail: this._artworkRef });
@@ -64,6 +67,8 @@ export class Artwork3DObject extends Mesh {
     }
 
     unhighlight(): void {
+        // We should still be able to unhighlight an artwork in case we are in a pending state.
+
         if(this.material instanceof MeshBasicMaterial) {
             this.material.color.set(0xffffff);
         }
