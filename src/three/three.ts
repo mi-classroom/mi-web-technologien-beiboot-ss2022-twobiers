@@ -19,21 +19,20 @@ const _pane = pane; // Keep to show the pane
 const raycaster = new THREE.Raycaster();
 
 let artworkObjects: Artwork3DObject[] = [];
+let intersections: THREE.Intersection<Artwork3DObject>[] = [];
 
 const highlightIntersectedArtworks = (rc: Raycaster) => {
-    const intersectedArtworks = rc.intersectObjects<Artwork3DObject>(artworkObjects, false)
-        .filter(intersection => intersection.distance < 100)
-        .sort((a, b) => a.distance - b.distance);
+    intersections.length = 0;
+    const nearest = rc.intersectObjects<Artwork3DObject>(artworkObjects, false, intersections)
+        .find(intersection => intersection.distance < 100);
     
     // Only highlight first
-    const nearest = intersectedArtworks[0];
     if (nearest) {
         nearest.object.highlight();
     }
 
     // Unhighlight all "pending" - artworks not currently intersected, but highlighted
-    const pendingHightlights = artworkObjects.filter(aw => aw.isHighlighted)
-        .filter(aw => !intersectedArtworks.some(i => i.object === aw) || nearest.object !== aw);
+    const pendingHightlights = artworkObjects.filter(aw => aw.isHighlighted && nearest?.object?.id !== aw.id);
     for(const pending of pendingHightlights) {
         pending.unhighlight();
     }
