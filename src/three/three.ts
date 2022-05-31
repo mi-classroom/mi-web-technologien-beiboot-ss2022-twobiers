@@ -22,9 +22,13 @@ let artworkObjects: Artwork3DObject[] = [];
 
 const highlightIntersectedArtworks = (rc: Raycaster) => {
     const intersectedArtworks = rc.intersectObjects<Artwork3DObject>(artworkObjects, false)
-        .filter(intersection => intersection.distance < 100);
-    for(const intersection of intersectedArtworks) {
-        intersection.object.highlight();
+        .filter(intersection => intersection.distance < 100)
+        .sort((a, b) => a.distance - b.distance);
+    
+    // Only highlight first
+    const nearest = intersectedArtworks[0];
+    if (nearest) {
+        nearest.object.highlight();
     }
 
     // Unhighlight all "pending" - artworks not currently intersected, but highlighted
@@ -65,6 +69,12 @@ const groupArtworkObjectsByDating = (objects: Artwork3DObject[], preserveGaps?: 
         return grouped;
     }
 
+    // Could have been done in the reduce method, but this would assume ordering.
+    // We are ordering the artworks beforehand, but we cannot assume that within
+    // this function. We could sort the objects before but this would be pointless
+    // if we're not preserving the gaps.
+    // This approach should (hopefully) be the best option in terms of reliablity, 
+    // maintainability and clarity. 
     const years = Object.keys(grouped).map(year => Number(year));
     const minYear = Math.min(...years);
     const maxYear = Math.max(...years);
@@ -99,7 +109,8 @@ export const setArtworks = async (artworks: DimensionizedCdaItem[]) => {
         groupBox.setFromObject(group);
         groupBox.getSize(groupBoxSize);
 
-        group.position.set(0, group.position.y, currentOffset);
+        group.position.setZ(currentOffset);
+        // group.position.set(0, group.position.y, currentOffset);
         group.rotation.set(0, 180 * Math.PI / 180, 0); // Flip the group to right align it on the z-axis. Not really smart but pragmatic
 
         currentOffset += groupBoxSize.z + 20;

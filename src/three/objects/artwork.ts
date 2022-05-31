@@ -23,7 +23,7 @@ const createGeometry = (dimensions: ItemDimensions): THREE.BufferGeometry => {
         case "circle":
             return new THREE.CircleGeometry(dimensions.dimension.diameter / 2, 32);
         case "rectangle":
-            return new THREE.BoxGeometry(dimensions.dimension.width, dimensions.dimension.height, dimensions.dimension.depth);
+            return new THREE.BoxGeometry(dimensions.dimension.width, dimensions.dimension.height, dimensions.dimension.depth || 1);
     }
 };
 
@@ -52,7 +52,32 @@ export class Artwork3DObject extends Mesh {
         });
         const mesh = new this(geometry, material, artwork);
         mesh.scale.set(artworkProperties.scale, artworkProperties.scale, artworkProperties.scale);
+        mesh.geometry.computeBoundingBox();
         return mesh;
+    }
+
+    get width(): number {
+        if(this.geometry.boundingBox === null) {
+            this.geometry.computeBoundingBox();
+        }
+        const box = this.geometry.boundingBox!;
+        return (box.max.x - box.min.x) * this.scale.x * 0.1;
+    }
+
+    get height(): number {
+        if(this.geometry.boundingBox === null) {
+            this.geometry.computeBoundingBox();
+        }
+        const box = this.geometry.boundingBox!;
+        return (box.max.y - box.min.y) * this.scale.y * 0.1;
+    }
+
+    get depth(): number {
+        if(this.geometry.boundingBox === null) {
+            this.geometry.computeBoundingBox();
+        }
+        const box = this.geometry.boundingBox!;
+        return (box.max.y - box.min.y) * this.scale.y * 0.1;
     }
 
     highlight(): void {

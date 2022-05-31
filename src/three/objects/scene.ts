@@ -18,10 +18,17 @@ const floorMaterial = new THREE.MeshBasicMaterial( {
 } );
 
 export const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+const gridHelper = new THREE.GridHelper(10000, 1000, 0x0000ff, 0x808080);
+floor.position.setY(-0.1);
+gridHelper.position.setY(0);
+scene.add(gridHelper);
+
 
 scene.background = new THREE.Color( 0x878787 );
 scene.fog = new THREE.Fog( 0x878787, 0, 750 );
-scene.add(new THREE.AxesHelper(100));
+const axesHelper = new THREE.AxesHelper(100);
+axesHelper.position.setY(0.05);
+scene.add(axesHelper);
 
 
 floor.rotateX(-Math.PI / 2);
