@@ -91,7 +91,7 @@ export const createControls = (camera: THREE.PerspectiveCamera, element: HTMLEle
         // Left click 
         if(event.button === 0) {
             if(!controls.isLocked) {
-                controls.lock()
+                controls.lock();
             }
         }
     }, false);
