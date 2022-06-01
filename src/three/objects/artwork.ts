@@ -33,6 +33,7 @@ export class Artwork3DObject extends Mesh {
     private _artworkRef: DimensionizedCdaItem;
     public userData: ArtworkUserData;
     public readonly name = "artwork";
+    private _cachedSize: THREE.Vector3 | null = null;
 
     private constructor (geometry: BufferGeometry, material: MeshBasicMaterial, artwork: DimensionizedCdaItem) {
         super(geometry, material);
@@ -57,28 +58,28 @@ export class Artwork3DObject extends Mesh {
         return mesh;
     }
 
-    get width(): number {
+    get size(): THREE.Vector3 {
+        if(this._cachedSize !== null) {
+            return this._cachedSize;
+        }
         if(this.geometry.boundingBox === null) {
             this.geometry.computeBoundingBox();
         }
         const box = this.geometry.boundingBox!;
-        return (box.max.x - box.min.x) * this.scale.x * 0.1;
+        this._cachedSize = box.max.sub(box.min).multiply(this.scale).multiplyScalar(0.1);
+        return this._cachedSize;
+    }
+
+    get width(): number {
+        return this.size.x;
     }
 
     get height(): number {
-        if(this.geometry.boundingBox === null) {
-            this.geometry.computeBoundingBox();
-        }
-        const box = this.geometry.boundingBox!;
-        return (box.max.y - box.min.y) * this.scale.y * 0.1;
+        return this.size.y;
     }
 
     get depth(): number {
-        if(this.geometry.boundingBox === null) {
-            this.geometry.computeBoundingBox();
-        }
-        const box = this.geometry.boundingBox!;
-        return (box.max.y - box.min.y) * this.scale.y * 0.1;
+        return this.size.z;
     }
 
     highlight(): void {
