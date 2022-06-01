@@ -2,7 +2,7 @@ import { Pane } from "tweakpane";
 import { controlProperties } from "./controls";
 import { artworkProperties } from "./objects/artwork";
 import * as EssentialsPlugin from '@tweakpane/plugin-essentials';
-import { CranachScene } from "./scene";
+import { CranachScene, sceneProperties } from "./scene";
 
 export class CranachPane extends Pane {
     public readonly fpsGraph;
@@ -16,6 +16,15 @@ export class CranachPane extends Pane {
             label: "fps",
             lineCount: 2,
         });
+
+        const debugFolder = this.addFolder({
+            title: "Debug",
+            expanded: false
+        });
+
+        debugFolder.addInput(sceneProperties, "enableHelpers", {
+            label: "Show Helpers"
+        }).on("change", (event) => scene.toggleHelpers(event.value));
 
         const highlightFolder = this.addFolder({
             title: "Highlight",

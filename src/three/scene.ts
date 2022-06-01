@@ -8,7 +8,15 @@ import { Crosshair } from "./objects/crosshair";
 
 const near = 0.1;
 
+type SceneProperties = {
+    enableHelpers: boolean;
+}
 
+type Helper = THREE.GridHelper | THREE.AxesHelper | THREE.BoxHelper;
+
+export const sceneProperties: SceneProperties = {
+    enableHelpers: true
+};
 
 const createArtworkObjects = (artworks: DimensionizedCdaItem[]) => Promise.all(artworks.map(art => Artwork3DObject.buildArtworkObject(art)));
 
@@ -58,6 +66,8 @@ export class CranachScene extends Scene {
     private _artworkObjects: Artwork3DObject[] = [];
     private _artworkIntersections: THREE.Intersection<Artwork3DObject>[] = [];
     
+    private _helpers: Helper[] = [];
+    
 
     constructor() {
         super();
@@ -94,12 +104,28 @@ export class CranachScene extends Scene {
         const gridHelper = new THREE.GridHelper(10000, 1000, 0x0000ff, 0x808080);
 
         gridHelper.position.setY(0);
-        this.add(gridHelper);
+        this._helpers.push(gridHelper);
         
         const axesHelper = new THREE.AxesHelper(100);
         axesHelper.position.setY(0.05);
-        this.add(axesHelper);
+        this._helpers.push(axesHelper);
         
+        this.toggleHelpers(sceneProperties.enableHelpers);
+    }
+
+    toggleHelpers(active: boolean) {
+        if(active) {
+            this.add(...this._helpers);
+        } else {
+            this.remove(...this._helpers);
+        }
+    }
+
+    private addHelper(helper: Helper) {
+        this._helpers.push(helper);
+        if(sceneProperties.enableHelpers) {
+            this.add(helper);
+        }
     }
 
     resetCamera() {
@@ -158,7 +184,8 @@ export class CranachScene extends Scene {
 
             const helper = new THREE.BoxHelper(group, 0xff0000);
             helper.update();
-            this.add(helper);
+            this.addHelper(helper);
+            
             this.add(group);
         }
     }
