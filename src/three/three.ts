@@ -4,9 +4,9 @@ import { DimensionizedCdaItem } from "../types";
 import { animateControls } from "./controls";
 import { getWebGLErrorMessage, isWebGL2Available } from "./utils";
 import { Artwork3DObject } from "./objects/artwork";
-import { camera, floor, renderer, scene } from "./objects/scene";
 import pane, { fpsGraph } from "./pane";
 import { ArtworkGroup } from "./objects/artworkGroup";
+import { CranachScene } from "./objects/scene";
 
 if(!isWebGL2Available()) {
     document.body.appendChild(getWebGLErrorMessage());
@@ -16,6 +16,7 @@ if(!isWebGL2Available()) {
 // @ts-ignore
 const _pane = pane; // Keep to show the pane
 
+export const scene = new CranachScene();
 const raycaster = new THREE.Raycaster();
 
 let artworkObjects: Artwork3DObject[] = [];
@@ -41,18 +42,15 @@ const highlightIntersectedArtworks = (rc: Raycaster) => {
 const animate = () => {
     //@ts-ignore
     fpsGraph.begin();
-    
     requestAnimationFrame( animate );
-
     animateControls();
+    scene.update();
 
     // Update floor to camera positon, so that it makes an illusion of infinite floor
-    floor.position.set(camera.position.x, floor.position.y, camera.position.z);
+    
 
-    raycaster.setFromCamera(new THREE.Vector2(), camera);
+    raycaster.setFromCamera(new THREE.Vector2(), scene.camera);
     highlightIntersectedArtworks(raycaster);
-
-    renderer.render( scene, camera );
     
     //@ts-ignore
     fpsGraph.end();
@@ -128,5 +126,5 @@ export const setArtworks = async (artworks: DimensionizedCdaItem[]) => {
 
 export const getSceneCanvas = (): HTMLCanvasElement => {
     animate();
-    return renderer.domElement;
+    return scene.renderer.domElement;
 };

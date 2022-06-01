@@ -1,8 +1,8 @@
 import { Pane } from "tweakpane";
 import { controlProperties } from "./controls";
 import { artworkProperties } from "./objects/artwork";
-import { resetCamera } from "./objects/scene";
 import * as EssentialsPlugin from '@tweakpane/plugin-essentials';
+// import { scene } from "./three";
 
 const pane = new Pane();
 pane.registerPlugin(EssentialsPlugin);
@@ -33,7 +33,7 @@ const controlFolder = pane.addFolder({
 const resetBtn = controlFolder.addButton({
     title: "Back to start"
 });
-resetBtn.on("click", resetCamera);
+// resetBtn.on("click", scene.resetCamera);
 controlFolder.addInput(controlProperties, "movementSpeed", {
     view: "number",
     label: "Movement Speed",
