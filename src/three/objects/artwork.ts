@@ -24,7 +24,7 @@ const createGeometry = (dimensions: ItemDimensions): THREE.BufferGeometry => {
         case "circle":
             return new THREE.CircleGeometry(dimensions.dimension.diameter / 2, 32);
         case "rectangle":
-            return new THREE.BoxGeometry(dimensions.dimension.width, dimensions.dimension.height, dimensions.dimension.depth || 1);
+            return new THREE.BoxGeometry(dimensions.dimension.width * artworkProperties.scale, dimensions.dimension.height * artworkProperties.scale, (dimensions.dimension.depth || 1) * artworkProperties.scale);
     }
 };
 
@@ -42,6 +42,8 @@ export class Artwork3DObject extends Mesh {
             year: artwork.dating.begin,
             rawItem: artwork
         }
+        // this.scale.set(artworkProperties.scale, artworkProperties.scale, artworkProperties.scale);
+        this.geometry.computeBoundingBox();
     }
 
     static async buildArtworkObject(artwork: DimensionizedCdaItem): Promise<Artwork3DObject> {
@@ -52,10 +54,7 @@ export class Artwork3DObject extends Mesh {
             color: 0xFFFFFF,
             map: texture
         });
-        const mesh = new this(geometry, material, artwork);
-        mesh.scale.set(artworkProperties.scale, artworkProperties.scale, artworkProperties.scale);
-        mesh.geometry.computeBoundingBox();
-        return mesh;
+        return new this(geometry, material, artwork);
     }
 
     get size(): THREE.Vector3 {

@@ -53,7 +53,7 @@ const groupArtworkObjectsByDating = (objects: Artwork3DObject[], preserveGaps?: 
 }
 
 export class CranachScene extends Scene {
-    public readonly camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, near, 1000);
+    public readonly camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, near, 1000);
     public readonly renderer = new THREE.WebGLRenderer({ 
         antialias: true,
         powerPreference: "high-performance"
@@ -62,6 +62,7 @@ export class CranachScene extends Scene {
     private readonly clock = new THREE.Clock();
     private readonly controls = new CranachControls(this.camera, this.renderer.domElement);
     private readonly raycaster = new THREE.Raycaster();
+    private readonly coords = new THREE.Vector2();
     
     private _artworkObjects: Artwork3DObject[] = [];
     private _artworkIntersections: THREE.Intersection<Artwork3DObject>[] = [];
@@ -138,7 +139,7 @@ export class CranachScene extends Scene {
 
         this.controls.animate();
 
-        this.raycaster.setFromCamera(new THREE.Vector2(), this.camera);
+        this.raycaster.setFromCamera(this.coords, this.camera);
         this.highlightIntersectedArtworks();
 
         // Update floor to camera positon, so that it makes an illusion of infinite floor
@@ -185,6 +186,12 @@ export class CranachScene extends Scene {
             const helper = new THREE.BoxHelper(group, 0xff0000);
             helper.update();
             this.addHelper(helper);
+
+            for(const artwork of element.artworkObjects) {
+                const artworkHelper = new THREE.BoxHelper(artwork, 0xFFFF00);
+                artworkHelper.update();
+                this.addHelper(artworkHelper);
+            }
             
             this.add(group);
         }
@@ -193,7 +200,7 @@ export class CranachScene extends Scene {
     private highlightIntersectedArtworks() {
         this._artworkIntersections.length = 0;
         const nearest = this.raycaster.intersectObjects<Artwork3DObject>(this._artworkObjects, false, this._artworkIntersections)
-            .find(intersection => intersection.distance < 100);
+            .find(intersection => intersection.distance < 20);
         
         // Only highlight first
         if (nearest) {

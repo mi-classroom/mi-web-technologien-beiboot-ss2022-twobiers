@@ -14,6 +14,7 @@ export const isArtworkGroup = (object: Object3D) : object is ArtworkGroup => {
 
 export class ArtworkGroup extends Group {
     public readonly name = "artworkGroup";
+    public readonly artworkObjects: ReadonlyArray<Artwork3DObject>;
 
     constructor(year: number, objects: Artwork3DObject[]) {
         super();
@@ -45,5 +46,6 @@ export class ArtworkGroup extends Group {
         const label = makeTextSprite(`${year}`, { fontsize: 50 });
         label.position.set(0, 20, 0);
         this.add(label);
+        this.artworkObjects = objects;
     }
 };
