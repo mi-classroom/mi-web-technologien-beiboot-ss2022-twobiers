@@ -1,120 +1,118 @@
 import * as THREE from "three";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 
-let moveForward = false;
-let moveBackward = false;
-let moveLeft = false;
-let moveRight = false;
-
-const velocity = new THREE.Vector3();
-const direction = new THREE.Vector3();
-let controls: PointerLockControls; 
-
-const clock = new THREE.Clock(true);
-
 type ControlProperties = {
     movementSpeed: number;
     zoomAmount: number;
 }
 
-const onKeyDown = (event: KeyboardEvent)  => {
-    switch (event.code) {
-        case 'ArrowUp':
-        case 'KeyW':
-            moveForward = true;
-            break;
-        case 'ArrowLeft':
-        case 'KeyA':
-            moveLeft = true;
-            break;
-        case 'ArrowDown':
-        case 'KeyS':
-            moveBackward = true;
-            break;
-        case 'ArrowRight':
-        case 'KeyD':
-            moveRight = true;
-            break;
-    }
-
-};
-
-const onKeyUp = (event: KeyboardEvent)  => {
-    switch (event.code) {
-        case 'ArrowUp':
-        case 'KeyW':
-            moveForward = false;
-            break;
-        case 'ArrowLeft':
-        case 'KeyA':
-            moveLeft = false;
-            break;
-        case 'ArrowDown':
-        case 'KeyS':
-            moveBackward = false;
-            break;
-        case 'ArrowRight':
-        case 'KeyD':
-            moveRight = false;
-            break;
-    }
-};
-
-export let controlProperties: ControlProperties = {
+export const controlProperties: ControlProperties = {
     movementSpeed: 20.0,
     zoomAmount: 35
 };
 
-export const animateControls = () => {
-    if(controls.isLocked) {
-        const delta = clock.getDelta();
+export class CranachControls extends PointerLockControls {
+    private readonly velocity = new THREE.Vector3();
+    private readonly direction = new THREE.Vector3();
+    private readonly clock = new THREE.Clock();
+    
+    private _moveForward = false;
+    private _moveBackward = false;
+    private _moveLeft = false;
+    private _moveRight = false;
 
-        velocity.x -= velocity.x * 10.0 * delta;
-        velocity.z -= velocity.z * 10.0 * delta;
+    constructor(camera: THREE.PerspectiveCamera, element: HTMLElement) {
+        super(camera, element);
 
-        direction.z = Number(moveForward) - Number(moveBackward);
-        direction.x = Number(moveRight) - Number(moveLeft);
-        direction.normalize();
-
-        if (moveForward || moveBackward) velocity.z -= direction.z * Math.pow(controlProperties.movementSpeed, 2) * delta;
-        if (moveLeft || moveRight) velocity.x -= direction.x * Math.pow(controlProperties.movementSpeed, 2) * delta;
-
-        controls.moveRight(-velocity.x * delta);
-        controls.moveForward(-velocity.z * delta);
-    }
-}
-
-export const createControls = (camera: THREE.PerspectiveCamera, element: HTMLElement): PointerLockControls => {
-    controls = new PointerLockControls(camera, element);
-
-    element.addEventListener("click", (event: MouseEvent) => {
-        // Left click 
-        if(event.button === 0) {
-            if(!controls.isLocked) {
-                controls.lock();
+        element.addEventListener("click", (event: MouseEvent) => {
+            // Left click 
+            if(event.button === 0) {
+                if(!this.isLocked) {
+                    this.lock();
+                }
             }
+        }, false);
+    
+        element.addEventListener("pointerdown", (event) => {
+            // Right click
+            if(event.button === 2) {
+                camera.fov -= controlProperties.zoomAmount;
+                camera.updateProjectionMatrix();
+            }
+        });
+    
+        element.addEventListener("pointerup", (event) => {
+            // Right click
+            if(event.button === 2) {
+                camera.fov += controlProperties.zoomAmount;
+                camera.updateProjectionMatrix();
+            }
+        });
+    
+    
+        document.addEventListener('keydown', (event) => this.onKeyDown(event));
+        document.addEventListener('keyup', (event) => this.onKeyUp(event));
+    }
+
+    public animate() {
+        if(this.isLocked) {
+            const delta = this.clock.getDelta();
+    
+            this.velocity.x -= this.velocity.x * 10.0 * delta;
+            this.velocity.z -= this.velocity.z * 10.0 * delta;
+    
+            this.direction.z = Number(this._moveForward) - Number(this._moveBackward);
+            this.direction.x = Number(this._moveRight) - Number(this._moveLeft);
+            this.direction.normalize();
+    
+            if (this._moveForward || this._moveBackward) this.velocity.z -= this.direction.z * Math.pow(controlProperties.movementSpeed, 2) * delta;
+            if (this._moveLeft || this._moveRight) this.velocity.x -= this.direction.x * Math.pow(controlProperties.movementSpeed, 2) * delta;
+    
+            this.moveRight(-this.velocity.x * delta);
+            this.moveForward(-this.velocity.z * delta);
         }
-    }, false);
+    }
 
-    element.addEventListener("pointerdown", (event) => {
-        // Right click
-        if(event.button === 2) {
-            camera.fov -= controlProperties.zoomAmount;
-            camera.updateProjectionMatrix();
+    private onKeyDown(event: KeyboardEvent) {
+        switch (event.code) {
+            case 'ArrowUp':
+            case 'KeyW':
+                this._moveForward = true;
+                break;
+            case 'ArrowLeft':
+            case 'KeyA':
+                this._moveLeft = true;
+                break;
+            case 'ArrowDown':
+            case 'KeyS':
+                this._moveBackward = true;
+                break;
+            case 'ArrowRight':
+            case 'KeyD':
+                this._moveRight = true;
+                break;
         }
-    });
-
-    element.addEventListener("pointerup", (event) => {
-        // Right click
-        if(event.button === 2) {
-            camera.fov += controlProperties.zoomAmount;
-            camera.updateProjectionMatrix();
+    
+    };
+    
+    private onKeyUp(event: KeyboardEvent) {
+        switch (event.code) {
+            case 'ArrowUp':
+            case 'KeyW':
+                this._moveForward = false;
+                break;
+            case 'ArrowLeft':
+            case 'KeyA':
+                this._moveLeft = false;
+                break;
+            case 'ArrowDown':
+            case 'KeyS':
+                this._moveBackward = false;
+                break;
+            case 'ArrowRight':
+            case 'KeyD':
+                this._moveRight = false;
+                break;
         }
-    });
-
-
-    document.addEventListener( 'keydown', onKeyDown );
-    document.addEventListener( 'keyup', onKeyUp );
-
-    return controls;
-};
+    };
+}

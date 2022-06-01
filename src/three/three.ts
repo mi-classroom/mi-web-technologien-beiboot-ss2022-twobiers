@@ -1,10 +1,4 @@
-import * as THREE from "three";
-import { Raycaster } from "three";
-import { DimensionizedCdaItem } from "../types";
-import { animateControls } from "./controls";
 import { getWebGLErrorMessage, isWebGL2Available } from "./utils";
-import { Artwork3DObject } from "./objects/artwork";
-import { ArtworkGroup } from "./objects/artworkGroup";
 import { CranachScene } from "./scene";
 import { CranachPane } from "./pane";
 

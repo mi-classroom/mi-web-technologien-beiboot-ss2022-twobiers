@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { Scene } from "three";
 import { DimensionizedCdaItem } from "../types";
-import { animateControls, createControls } from "./controls";
+import { CranachControls } from "./controls";
 import { Artwork3DObject } from "./objects/artwork";
 import { ArtworkGroup } from "./objects/artworkGroup";
 import { Crosshair } from "./objects/crosshair";
@@ -52,7 +52,7 @@ export class CranachScene extends Scene {
     });
     public readonly floor: THREE.Mesh;
     private readonly clock = new THREE.Clock();
-    private readonly controls = createControls(this.camera, this.renderer.domElement);
+    private readonly controls = new CranachControls(this.camera, this.renderer.domElement);
     private readonly raycaster = new THREE.Raycaster();
     
     private _artworkObjects: Artwork3DObject[] = [];
@@ -65,7 +65,7 @@ export class CranachScene extends Scene {
         // Renderer
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        window.addEventListener("resize", this.onWindowResize);
+        window.addEventListener("resize", () => this.onWindowResize());
 
         // Camera
         this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -110,14 +110,14 @@ export class CranachScene extends Scene {
     update() {
         const elapsedTime = this.clock.getElapsedTime();
 
-        animateControls();
+        this.controls.animate();
 
         this.raycaster.setFromCamera(new THREE.Vector2(), this.camera);
         this.highlightIntersectedArtworks();
 
         // Update floor to camera positon, so that it makes an illusion of infinite floor
         this.floor.position.set(this.camera.position.x, this.floor.position.y, this.camera.position.z);
-        
+
         this.renderer.render(this, this.camera);
     }
 
