@@ -1,9 +1,11 @@
 import * as THREE from "three";
 import { Scene } from "three";
-import { createControls } from "../controls";
-import { Crosshair } from "./crosshair";
+import { createControls } from "./controls";
+import { Crosshair } from "./objects/crosshair";
 
 const near = 0.1;
+
+
 
 export class CranachScene extends Scene {
     public readonly camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, near, 1000);
