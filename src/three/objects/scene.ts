@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { createControls } from "../controls";
-import { crosshair } from "./crosshair";
+import { Crosshair } from "./crosshair";
 
 const near = 0.1;
 
@@ -48,7 +48,7 @@ renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight );
 
 // Crosshair
-camera.add(crosshair);
+camera.add(new Crosshair());
 
 window.addEventListener("resize", () => {
     camera.aspect = window.innerWidth / window.innerHeight;

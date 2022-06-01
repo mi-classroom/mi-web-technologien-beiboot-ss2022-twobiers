@@ -6,7 +6,7 @@ import { getWebGLErrorMessage, isWebGL2Available } from "./utils";
 import { Artwork3DObject } from "./objects/artwork";
 import { camera, floor, renderer, scene } from "./objects/scene";
 import pane, { fpsGraph } from "./pane";
-import { createArtworkModelGroupOfYear } from "./objects/artworkGroup";
+import { ArtworkGroup } from "./objects/artworkGroup";
 
 if(!isWebGL2Available()) {
     document.body.appendChild(getWebGLErrorMessage());
@@ -103,7 +103,7 @@ export const setArtworks = async (artworks: DimensionizedCdaItem[]) => {
     const groups = groupArtworkObjectsByDating(artworkObjects, true);
 
     // We create modeled groups
-    const modeledGroups = Object.entries(groups).map(([year, arr]) => createArtworkModelGroupOfYear(Number(year), arr));
+    const modeledGroups = Object.entries(groups).map(([year, arr]) => new ArtworkGroup(Number(year), arr));
 
     let currentOffset = 0;
     const groupBox = new THREE.Box3();
