@@ -1,6 +1,6 @@
 import './main.scss';
 import { getBestOfItems, hasAnyItems, saveItems } from './storage/storage';
-import { getSceneCanvas, setArtworks } from './three/three';
+import { scene } from './three/three';
 import { dataProxyUrl, dimToString, trimBraces } from './three/utils';
 import { CdaItemCollection, DimensionizedCdaItem } from './types';
 import { parseDimensions } from './utils/dimensionParser';
@@ -8,8 +8,9 @@ import { parseDimensions } from './utils/dimensionParser';
 const infoContainer: HTMLElement = document.getElementById("info")!;
 
 const showCanvas = async () => {
-    await loadArtworksIntoScene();
-    document.body.appendChild(getSceneCanvas());
+    const items = await getDimensionizedBestOfItems();
+    scene.setArtworks(items);
+    document.body.appendChild(scene.renderer.domElement);
 }
 
 const createDivider = (): HTMLSpanElement => {
@@ -112,11 +113,11 @@ const removeArtworkInfo = (artwork: DimensionizedCdaItem) => {
     existing?.remove();
 };
 
-const loadArtworksIntoScene = async() => {
+const getDimensionizedBestOfItems = async(): Promise<DimensionizedCdaItem[]> => {
     const bestOfItems = await getBestOfItems();
     // TODO: We could perform a migration in the IndexedDB and safe the parsed dimensions there.
     //       Leave it for the moment and see whether it works anyway.
-    const dimensionizedBestOfItems = bestOfItems.map(item => {
+    return bestOfItems.map(item => {
         const dimensionized: DimensionizedCdaItem = {
             ...item,
             parsedDimensions: parseDimensions(item.dimensions)
@@ -126,8 +127,6 @@ const loadArtworksIntoScene = async() => {
         }
         return dimensionized;
     });
-
-    await setArtworks(dimensionizedBestOfItems);
 }
 
 init()
