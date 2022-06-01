@@ -1,4 +1,3 @@
-import * as THREE from "three";
 import { Group, Object3D } from "three";
 import { makeTextSprite } from "../utils";
 import { Artwork3DObject } from "./artwork";

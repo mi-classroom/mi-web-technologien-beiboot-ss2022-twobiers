@@ -135,7 +135,8 @@ export class CranachScene extends Scene {
     }
 
     update() {
-        const elapsedTime = this.clock.getElapsedTime();
+        // @ts-ignore
+        const delta = this.clock.getDelta();
 
         this.controls.animate();
 

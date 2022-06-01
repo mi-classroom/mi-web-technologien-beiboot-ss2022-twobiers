@@ -33,7 +33,7 @@ export class Artwork3DObject extends Mesh {
     private _artworkRef: DimensionizedCdaItem;
     public userData: ArtworkUserData;
     public readonly name = "artwork";
-    private _cachedSize: THREE.Vector3 | null = null;
+    // private _cachedSize: THREE.Vector3 | null = null;
 
     private constructor (geometry: BufferGeometry, material: MeshBasicMaterial, artwork: DimensionizedCdaItem) {
         super(geometry, material);
