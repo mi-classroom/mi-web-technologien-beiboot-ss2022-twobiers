@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { BufferGeometry, Mesh, MeshBasicMaterial, Object3D } from "three";
 import { DimensionizedCdaItem, ItemDimensions } from "../../types";
+import { dataProxyUrl } from "../utils";
 
 type ArtworkUserData = { 
     year: number,
@@ -44,7 +45,7 @@ export class Artwork3DObject extends Mesh {
 
     static async buildArtworkObject(artwork: DimensionizedCdaItem): Promise<Artwork3DObject> {
         const geometry = createGeometry(artwork.parsedDimensions);
-        const url = artwork.images.overall.images[0].sizes.medium.src.replaceAll("imageserver-2022", "data-proxy/image.php?subpath=");
+        const url = dataProxyUrl(artwork.images.overall.images[0].sizes.medium.src);
         const texture = await new THREE.TextureLoader().loadAsync(url);
         const material = new THREE.MeshBasicMaterial({ 
             color: 0xFFFFFF,

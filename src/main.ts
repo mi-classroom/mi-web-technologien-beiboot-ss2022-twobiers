@@ -1,7 +1,7 @@
 import './main.scss';
 import { getBestOfItems, hasAnyItems, saveItems } from './storage/storage';
 import { getSceneCanvas, setArtworks } from './three/three';
-import { dimToString, trimBraces } from './three/utils';
+import { dataProxyUrl, dimToString, trimBraces } from './three/utils';
 import { CdaItemCollection, DimensionizedCdaItem } from './types';
 import { parseDimensions } from './utils/dimensionParser';
 
@@ -73,13 +73,25 @@ const buildArtworkInfo = (artwork: DimensionizedCdaItem): HTMLDivElement => {
     const div = document.createElement("div");
     div.classList.add("info-container");
 
-    div.innerHTML = `
+    const textDiv = document.createElement("div");
+    textDiv.classList.add("info-text");
+
+    textDiv.innerHTML = `
         <h1>${artwork.metadata.title}</h1>
         <h2>${artwork.involvedPersons[0].name}</h2>
         <p>${trimBraces(artwork.medium)}</p>
         <p>${artwork.repository}</p>
         <p>${dimToString(artwork.parsedDimensions)}</p>
     `;
+
+    div.appendChild(textDiv);
+
+    const previewDiv = document.createElement("div");
+    const previewImage = document.createElement("img");
+    previewImage.src = dataProxyUrl(artwork.images.overall.images[0].sizes.medium.src);
+    previewDiv.classList.add("info-preview");
+    previewDiv.appendChild(previewImage);
+    div.appendChild(previewDiv);
     
     return div;
 };

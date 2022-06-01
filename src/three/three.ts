@@ -92,7 +92,6 @@ const groupArtworkObjectsByDating = (objects: Artwork3DObject[], preserveGaps?: 
     return grouped;
 }
 
-
 export const setArtworks = async (artworks: DimensionizedCdaItem[]) => {
     // We sort the array by the dating to maintain consistency
     artworks = artworks.sort((a, b) => a.dating.begin - b.dating.begin);

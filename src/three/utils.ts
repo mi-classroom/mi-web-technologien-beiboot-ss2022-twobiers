@@ -114,3 +114,10 @@ export const dimToString = (dimension: ItemDimensions): string => {
             return `${dimension.dimension.width} x ${dimension.dimension.height} cm (bxh), Fläche: ${calcSurfaceArea(dimension)}cm²`;
     }
 };
+
+export const dataProxyUrl = (str: string): string => {
+    if(!str.includes("imageserver-2022")) {
+        throw Error(`Invalid URL provided: ${str}`);
+    }
+    return str.replaceAll("imageserver-2022", "data-proxy/image.php?subpath=");
+}
