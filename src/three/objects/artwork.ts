@@ -24,7 +24,7 @@ const createGeometry = (dimensions: ItemDimensions): THREE.BufferGeometry => {
         case "circle":
             return new THREE.CircleGeometry(dimensions.dimension.diameter / 2, 32);
         case "rectangle":
-            return new THREE.BoxGeometry(dimensions.dimension.width * artworkProperties.scale, dimensions.dimension.height * artworkProperties.scale, (dimensions.dimension.depth || 1) * artworkProperties.scale);
+            return new THREE.BoxGeometry(dimensions.dimension.width, dimensions.dimension.height, dimensions.dimension.depth || 1);
     }
 };
 
@@ -42,7 +42,7 @@ export class Artwork3DObject extends Mesh {
             year: artwork.dating.begin,
             rawItem: artwork
         }
-        // this.scale.set(artworkProperties.scale, artworkProperties.scale, artworkProperties.scale);
+        this.scale.set(artworkProperties.scale, artworkProperties.scale, artworkProperties.scale);
         this.geometry.computeBoundingBox();
     }
 
@@ -57,28 +57,46 @@ export class Artwork3DObject extends Mesh {
         return new this(geometry, material, artwork);
     }
 
-    get size(): THREE.Vector3 {
-        if(this._cachedSize !== null) {
-            return this._cachedSize;
-        }
+    // TODO: I really don't know why this calculation fails. It will result in 1/2 
+    //       the actual object size. I guess its some weird Shenannigan with mutable data structure
+    //       and getter methods. Leaving it for now as it is as I need to focus on other things.
+    // get size(): THREE.Vector3 {
+    //     if(this._cachedSize !== null) {
+    //         return this._cachedSize;
+    //     }
+    //     if(this.geometry.boundingBox === null) {
+    //         this.geometry.computeBoundingBox();
+    //     }
+    //     const box = this.geometry.boundingBox!;
+    //     this._cachedSize = box.max.sub(box.min).multiply(this.scale).multiplyScalar(0.1);
+    //     return this._cachedSize;
+    // }
+
+    get width(): number {
         if(this.geometry.boundingBox === null) {
             this.geometry.computeBoundingBox();
         }
         const box = this.geometry.boundingBox!;
-        this._cachedSize = box.max.sub(box.min).multiply(this.scale).multiplyScalar(0.1);
-        return this._cachedSize;
-    }
-
-    get width(): number {
-        return this.size.x;
+        return (box.max.x - box.min.x) * this.scale.x * 0.1;
+        // return this.size.x;
     }
 
     get height(): number {
-        return this.size.y;
+        if(this.geometry.boundingBox === null) {
+            this.geometry.computeBoundingBox();
+        }
+        const box = this.geometry.boundingBox!;
+        return (box.max.y - box.min.y) * this.scale.y * 0.1;
+        // return this.size.y;
     }
 
     get depth(): number {
-        return this.size.z;
+        if(this.geometry.boundingBox === null) {
+            this.geometry.computeBoundingBox();
+        }
+        const box = this.geometry.boundingBox!;
+        return (box.max.z - box.min.z) * this.scale.z * 0.1;
+        // return this.size.z;
     }
 
     highlight(): void {
