@@ -46,7 +46,7 @@ export class CranachPane extends Pane {
         const resetBtn = controlFolder.addButton({
             title: "Back to start"
         });
-        resetBtn.on("click", scene.resetCamera);
+        resetBtn.on("click", () => scene.resetCamera());
         controlFolder.addInput(controlProperties, "movementSpeed", {
             view: "number",
             label: "Movement Speed",
