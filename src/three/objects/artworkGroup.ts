@@ -43,7 +43,7 @@ export class ArtworkGroup extends Group {
         }
         // Place a year indicator on top
         const label = makeTextSprite(`${year}`, { fontsize: 50 });
-        label.position.set(0, 20, 0);
+        label.position.set(-10, 20, 0);
         this.add(label);
         this.artworkObjects = objects;
     }
