@@ -14,7 +14,7 @@ export const isArtworkObject = (object: Object3D) : object is Artwork3DObject =>
 }
 
 export const artworkProperties = {
-    enableVisualHighlight: true,
+    enableVisualHighlight: false,
     highlightColor: 0x8cff32,
     scale: 0.1 // We assume that 1 unit is 1m
 };
