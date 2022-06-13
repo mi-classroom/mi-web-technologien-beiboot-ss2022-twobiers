@@ -2,37 +2,83 @@
 @import './assets/styles/scss/abstracts/variables.scss';
 @import './assets/styles/scss/abstracts/icons.scss';
 
+:root {
+    --tp-base-background-color: hsla(0, 0%, 10%, 0.80);
+    --tp-base-shadow-color: hsla(0, 0%, 0%, 0.2);
+    --tp-button-background-color: hsla(0, 0%, 80%, 1.00);
+    --tp-button-background-color-active: hsla(0, 0%, 100%, 1.00);
+    --tp-button-background-color-focus: hsla(0, 0%, 95%, 1.00);
+    --tp-button-background-color-hover: hsla(0, 0%, 85%, 1.00);
+    --tp-button-foreground-color: hsla(0, 0%, 0%, 0.80);
+    --tp-container-background-color: hsla(0, 0%, 0%, 0.30);
+    --tp-container-background-color-active: hsla(0, 0%, 0%, 0.60);
+    --tp-container-background-color-focus: hsla(0, 0%, 0%, 0.50);
+    --tp-container-background-color-hover: hsla(0, 0%, 0%, 0.40);
+    --tp-container-foreground-color: hsla(0, 0%, 100%, 0.50);
+    --tp-groove-foreground-color: hsla(0, 0%, 0%, 0.20);
+    --tp-input-background-color: hsla(0, 0%, 0%, 0.30);
+    --tp-input-background-color-active: hsla(0, 0%, 0%, 0.60);
+    --tp-input-background-color-focus: hsla(0, 0%, 0%, 0.50);
+    --tp-input-background-color-hover: hsla(0, 0%, 0%, 0.40);
+    --tp-input-foreground-color: hsla(0, 0%, 100%, 0.50);
+    --tp-label-foreground-color: hsla(0, 0%, 100%, 0.50);
+    --tp-monitor-background-color: hsla(0, 0%, 0%, 0.30);
+    --tp-monitor-foreground-color: hsla(0, 0%, 100%, 0.30);
+}
+
+.tp-dfwv {
+    width: 20rem !important;
+}
+
 body {
     background-color: $darker;
     color: $lightest;
     font-family: $font-sans-serif;
-    display: flex;
-    flex-direction: column;
-    justify-items: center;
-    align-items: center;
+    margin: 0;
 }
 
-#toolbar {
-    display: flex;
-    flex-direction: row;
+#controls {
+    position: absolute;
+    bottom: 0px;
+    padding: 1rem;
+    z-index: 100;
+    margin: 0 auto;
+    background-color: rgba($color: $dark, $alpha: 0.5);
+    b {
+        color: $accent-dark;
+    }
 }
 
-.item-stream {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    .item {
-        background-color: $lighten-strong;
+#info {
+    position: absolute;
+    top: 0px;
+    padding: 1rem;
+    z-index: 100;
+
+    .info-container {
+        margin: 1rem;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        max-width: 32rem;
+        background-color: $dark;
         display: flex;
-        flex-direction: column;
-        flex: 1 1 0px;
-        align-items: center;
-        border: $darkest solid 1px;
-        padding: 15px;
-        img {
-            width: 200px;
+        flex-direction: row;
+        align-content: flex-start;
+        filter: opacity(0.9);
+
+        .info-text {
+            flex-grow: 1;
+            width: 60%;
         }
-    }    
+
+        .info-preview {
+            flex-grow: 0;
+            width: 40%;
+            img {
+                width: 100%;
+            }
+        }
+    }
 }
 
 .upload-banner {

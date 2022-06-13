@@ -17,6 +17,16 @@ export type CdaItemMetadata = {
     date: string;
 };
 
+export type CdaItemDating = {
+    dated: string;
+    begin: number;
+    end: number;
+};
+
+export type CdaInvolvedPerson = {
+    name: string;
+};
+
 export type CdaItem = {
     objectId: number;
     metadata: CdaItemMetadata;
@@ -25,6 +35,9 @@ export type CdaItem = {
     isBestOf: boolean;
     images: CdaItemImage;
     sortingNumber: string;
+    dimensions: string;
+    dating: CdaItemDating;
+    involvedPersons: CdaInvolvedPerson[];
 };
 
 export type CdaItemCollection = {
@@ -33,3 +46,29 @@ export type CdaItemCollection = {
 
 /* 
 ---------------------------------------------------------------------------- */
+
+export type Shape = "rectangle" | "circle";
+
+export type RectDimension = {
+    width: number;
+    height: number;
+    depth?: number;
+};
+
+export type CircleDimension = {
+    diameter: number;
+};
+
+export type ItemRectDimensions = {
+    shape: "rectangle";
+    dimension: RectDimension;
+};
+
+export type ItemCircleDimensions = {
+    shape: "circle";
+    dimension: CircleDimension
+};
+
+export type ItemDimensions = ItemRectDimensions | ItemCircleDimensions;
+
+export type DimensionizedCdaItem = CdaItem & { parsedDimensions: ItemDimensions };
