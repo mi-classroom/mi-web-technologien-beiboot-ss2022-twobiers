@@ -1,6 +1,5 @@
 import './main.scss';
 import { getBestOfItems, hasAnyItems, saveItems } from './storage/storage';
-import { Artwork3DObject, SelectionEvent } from './three/objects/artwork';
 import { scene } from './three/three';
 import { dataProxyUrl, dimToString, trimBraces } from './three/utils';
 import { CdaItemCollection, DimensionizedCdaItem } from './types';

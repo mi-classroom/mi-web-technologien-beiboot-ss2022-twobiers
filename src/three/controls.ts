@@ -25,6 +25,7 @@ export class CranachControls extends PointerLockControls {
     private _moveBackward = false;
     private _moveLeft = false;
     private _moveRight = false;
+    // @ts-ignore
     private _flyMode = false; // TODO
 
     constructor(camera: THREE.PerspectiveCamera, element: HTMLElement, minY: number) {
