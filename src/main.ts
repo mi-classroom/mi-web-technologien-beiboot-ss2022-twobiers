@@ -1,11 +1,13 @@
 import './main.scss';
 import { getBestOfItems, hasAnyItems, saveItems } from './storage/storage';
+import { Artwork3DObject, SelectionEvent } from './three/objects/artwork';
 import { scene } from './three/three';
 import { dataProxyUrl, dimToString, trimBraces } from './three/utils';
 import { CdaItemCollection, DimensionizedCdaItem } from './types';
 import { parseDimensions } from './utils/dimensionParser';
 
 const infoContainer: HTMLElement = document.getElementById("info")!;
+const selectionContainer: HTMLElement = document.getElementById("selection")!;
 
 const showCanvas = async () => {
     const items = await getDimensionizedBestOfItems();
@@ -97,6 +99,44 @@ const buildArtworkInfo = (artwork: DimensionizedCdaItem): HTMLDivElement => {
     return div;
 };
 
+const buildArtworkSelection = (artwork: DimensionizedCdaItem): HTMLDivElement => {
+    const div = document.createElement("div");
+    div.classList.add("selection-container");
+
+    const textDiv = document.createElement("div");
+    textDiv.classList.add("selection-text");
+
+    textDiv.innerHTML = `
+        <h1>${artwork.metadata.title}</h1>
+    `;
+
+    const previewDiv = document.createElement("div");
+    const previewImage = document.createElement("img");
+    previewImage.src = dataProxyUrl(artwork.images.overall.images[0].sizes.medium.src);
+    previewDiv.classList.add("selection-preview");
+    previewDiv.appendChild(previewImage);
+    div.appendChild(previewDiv);
+    div.appendChild(textDiv);
+    
+    return div;
+};
+
+const addSelection = (artwork: DimensionizedCdaItem) => {
+    const id = artwork.objectId;
+    const existing = selectionContainer.querySelector(`div[artwork-id="${id}"`);
+    if(!existing) {
+        const info = buildArtworkSelection(artwork);
+        info.setAttribute("artwork-id", String(id));
+        selectionContainer.append(info);
+    }
+};
+
+const removeSelection = (artwork: DimensionizedCdaItem) => {
+    const id = artwork.objectId;
+    const existing = selectionContainer.querySelector(`div[artwork-id="${id}"`);
+    existing?.remove();
+};
+
 const addArtworkInfo = (artwork: DimensionizedCdaItem) => {
     const id = artwork.objectId;
     const existing = infoContainer.querySelector(`div[artwork-id="${id}"`);
@@ -134,11 +174,5 @@ init()
 
 document.addEventListener("highlight", (event: any) => addArtworkInfo(event.detail));
 document.addEventListener("unhighlight", (event: any) => removeArtworkInfo(event.detail));
-document.addEventListener("select", (event: any) => console.log({
-    kind: "select",
-    event
-}));
-document.addEventListener("unselect", (event: any) => console.log({
-    kind: "unselect",
-    event
-}));
+document.addEventListener("select", (event: any) => addSelection(event.detail.userData.rawItem));
+document.addEventListener("unselect", (event: any) => removeSelection(event.detail.userData.rawItem));

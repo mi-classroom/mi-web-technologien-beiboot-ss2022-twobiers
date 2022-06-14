@@ -8,6 +8,10 @@ type ArtworkUserData = {
     rawItem: DimensionizedCdaItem 
 };
 
+export interface SelectionEvent extends CustomEvent {
+    detail: Artwork3DObject
+}
+
 // Very trivial type guard, but sufficient
 export const isArtworkObject = (object: Object3D) : object is Artwork3DObject => {
     return (object.name === "artwork");
@@ -105,7 +109,7 @@ export class Artwork3DObject extends Mesh {
             return;
         }
         this.isSelected = true;
-        const selectEvent = new CustomEvent("select", { detail: this });
+        const selectEvent = new CustomEvent("select", { detail: this }) as SelectionEvent;
         document.dispatchEvent(selectEvent);
     }
 
@@ -113,7 +117,7 @@ export class Artwork3DObject extends Mesh {
         if(!this.isSelected) {
             return;
         }
-        const unselect = new CustomEvent("unselect", { detail: this });
+        const unselect = new CustomEvent("unselect", { detail: this }) as SelectionEvent;
         document.dispatchEvent(unselect);
     }
 
