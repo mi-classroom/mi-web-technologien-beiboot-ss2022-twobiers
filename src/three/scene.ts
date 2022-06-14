@@ -58,9 +58,10 @@ export class CranachScene extends Scene {
         antialias: true,
         powerPreference: "high-performance"
     });
+    public readonly eyeheight = 1.70 / near;
     public readonly floor: THREE.Mesh;
     private readonly clock = new THREE.Clock();
-    private readonly controls = new CranachControls(this.camera, this.renderer.domElement);
+    private readonly controls = new CranachControls(this.camera, this.renderer.domElement, this.eyeheight);
     private readonly raycaster = new THREE.Raycaster();
     private readonly coords = new THREE.Vector2();
     
@@ -131,7 +132,7 @@ export class CranachScene extends Scene {
     }
 
     resetCamera() {
-        this.camera.position.set(10, 1.70 / near, -10); // We assume a person with about 1,75m body size. 5cm difference for eye height. Still needs to be aligned with camera field
+        this.camera.position.set(10, this.eyeheight, -10); // We assume a person with about 1,75m body size. 5cm difference for eye height. Still needs to be aligned with camera field
         this.camera.rotation.set(0, 180 * Math.PI / 180, 0); // Turn around
     }
 
