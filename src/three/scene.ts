@@ -3,6 +3,7 @@ import { Intersection, Scene } from "three";
 import { DimensionizedCdaItem } from "../types";
 import { CranachControls } from "./controls";
 import { Artwork3DObject } from "./objects/artwork";
+import { ArtworkConnection } from "./objects/artworkConnection";
 import { ArtworkGroup } from "./objects/artworkGroup";
 import { Crosshair } from "./objects/crosshair";
 
@@ -198,12 +199,30 @@ export class CranachScene extends Scene {
             
             this.add(group);
         }
+
+        // TODO: For the moment we will render also the relation connections for development purposes.
+        // remove when ready.
+        for(const artwork of this._artworkObjects) {
+            const relatedArtworks = this.findRelatedArtworks(artwork);
+            if(relatedArtworks.length > 0) {
+                const connections = relatedArtworks.map(related => new ArtworkConnection(artwork, related));
+                this.add(...connections);
+            }
+        }
     }
 
     private findNearestIntersectedArtwork(): Intersection<Artwork3DObject> | undefined {
         this._artworkIntersections.length = 0;
         return this.raycaster.intersectObjects<Artwork3DObject>(this._artworkObjects, false, this._artworkIntersections)
             .find(intersection => intersection.distance < 20);
+    }
+
+    private findRelatedArtworks(artwork: Artwork3DObject): Artwork3DObject[] {
+        const references = artwork.userData.rawItem.references;
+        if(references === undefined || references?.length === 0) {
+            return [];
+        }
+        return this._artworkObjects.filter(o => references.some(ref => ref.inventoryNumber === o.userData.rawItem.inventoryNumber));
     }
 
     private selectNearestIntersectedArtwork() {
@@ -216,7 +235,13 @@ export class CranachScene extends Scene {
                 selected.unselect();
             }
 
-            nearest.object.select();
+            const nearestObject = nearest.object;
+            nearestObject.select();
+            const relatedArtworks = this.findRelatedArtworks(nearestObject);
+            if(relatedArtworks.length > 0) {
+                const connections = relatedArtworks.map(related => new ArtworkConnection(nearestObject, related));
+                this.add(...connections);
+            }
         }
     }
 
