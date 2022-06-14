@@ -38,6 +38,17 @@ export type CdaItem = {
     dimensions: string;
     dating: CdaItemDating;
     involvedPersons: CdaInvolvedPerson[];
+    references?: CdaReference[];
+};
+
+export type CdaReferenceType = "RELATED_IN_CONTENT_TO" | "SIMILAR_TO" | "BELONGS_TO" | "PART_OF_WORK";
+
+export type CdaReference = {
+    text: string;
+    kind: CdaReferenceType;
+    inventoryNumberPrefox: string | "";
+    inventoryNumber: string;
+    remarks: unknown[];
 };
 
 export type CdaItemCollection = {
