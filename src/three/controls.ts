@@ -91,6 +91,8 @@ export class CranachControls extends PointerLockControls {
                 this.velocity.y = 0;
                 this.getObject().position.y = this.minY;
             }
+        } else {
+            this.velocity.set(0, 0, 0);
         }
     }
 
