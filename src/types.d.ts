@@ -27,6 +27,8 @@ export type CdaInvolvedPerson = {
     name: string;
 };
 
+export type CdaInventoryNumber = string;
+
 export type CdaItem = {
     objectId: number;
     metadata: CdaItemMetadata;
@@ -37,6 +39,7 @@ export type CdaItem = {
     sortingNumber: string;
     dimensions: string;
     dating: CdaItemDating;
+    inventoryNumber: CdaInventoryNumber;
     involvedPersons: CdaInvolvedPerson[];
     references?: CdaReference[];
 };
@@ -46,8 +49,8 @@ export type CdaReferenceType = "RELATED_IN_CONTENT_TO" | "SIMILAR_TO" | "BELONGS
 export type CdaReference = {
     text: string;
     kind: CdaReferenceType;
-    inventoryNumberPrefox: string | "";
-    inventoryNumber: string;
+    inventoryNumberPrefix: string | "";
+    inventoryNumber: CdaInventoryNumber;
     remarks: unknown[];
 };
 
