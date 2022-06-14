@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Scene } from "three";
+import { Intersection, Scene } from "three";
 import { DimensionizedCdaItem } from "../types";
 import { CranachControls } from "./controls";
 import { Artwork3DObject } from "./objects/artwork";
@@ -77,6 +77,7 @@ export class CranachScene extends Scene {
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         window.addEventListener("resize", () => this.onWindowResize());
+        this.renderer.domElement.addEventListener("click", () => this.selectNearestIntersectedArtwork());
 
         // Camera
         this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -198,10 +199,29 @@ export class CranachScene extends Scene {
         }
     }
 
+    private findNearestIntersectedArtwork(): Intersection<Artwork3DObject> | undefined {
+        this._artworkIntersections.length = 0;
+        return this.raycaster.intersectObjects<Artwork3DObject>(this._artworkObjects, false, this._artworkIntersections)
+            .find(intersection => intersection.distance < 20);
+    }
+
+    private selectNearestIntersectedArtwork() {
+        const nearest = this.findNearestIntersectedArtwork();
+        
+        // Lets just (un)select if we do really have a intersection available 
+        if (nearest && !nearest.object.isSelected) {
+            const alreadySelected = this._artworkObjects.filter(aw => aw.isSelected);
+            for(const selected of alreadySelected) {
+                selected.unselect();
+            }
+
+            nearest.object.select();
+        }
+    }
+
     private highlightIntersectedArtworks() {
         this._artworkIntersections.length = 0;
-        const nearest = this.raycaster.intersectObjects<Artwork3DObject>(this._artworkObjects, false, this._artworkIntersections)
-            .find(intersection => intersection.distance < 20);
+        const nearest = this.findNearestIntersectedArtwork();
         
         // Only highlight first
         if (nearest) {

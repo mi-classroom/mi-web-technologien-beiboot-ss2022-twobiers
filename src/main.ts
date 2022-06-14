@@ -134,3 +134,11 @@ init()
 
 document.addEventListener("highlight", (event: any) => addArtworkInfo(event.detail));
 document.addEventListener("unhighlight", (event: any) => removeArtworkInfo(event.detail));
+document.addEventListener("select", (event: any) => console.log({
+    kind: "select",
+    event
+}));
+document.addEventListener("unselect", (event: any) => console.log({
+    kind: "unselect",
+    event
+}));

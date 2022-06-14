@@ -30,6 +30,7 @@ const createGeometry = (dimensions: ItemDimensions): THREE.BufferGeometry => {
 
 export class Artwork3DObject extends Mesh {
     public isHighlighted: boolean = false;    
+    public isSelected: boolean = false;    
     private _artworkRef: DimensionizedCdaItem;
     public userData: ArtworkUserData;
     public readonly name = "artwork";
@@ -97,6 +98,23 @@ export class Artwork3DObject extends Mesh {
         const box = this.geometry.boundingBox!;
         return (box.max.z - box.min.z) * this.scale.z * 0.1;
         // return this.size.z;
+    }
+
+    select(): void {
+        if(this.isSelected) {
+            return;
+        }
+        this.isSelected = true;
+        const selectEvent = new CustomEvent("select", { detail: this });
+        document.dispatchEvent(selectEvent);
+    }
+
+    unselect(): void {
+        if(!this.isSelected) {
+            return;
+        }
+        const unselect = new CustomEvent("unselect", { detail: this });
+        document.dispatchEvent(unselect);
     }
 
     highlight(): void {
