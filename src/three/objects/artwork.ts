@@ -132,7 +132,6 @@ export class Artwork3DObject extends Mesh {
             return;
         }
         for(const holyChild of this.children.filter(c => c.name === "holy-mesh")) {
-            console.log("Holy child");
             this.remove(holyChild);
             this.isHolyHighlighted = false;
         }
@@ -152,6 +151,7 @@ export class Artwork3DObject extends Mesh {
         if(!this.isSelected) {
             return;
         }
+        this.isSelected = false;
         this.unhighlightHoly();
         const unselect = new CustomEvent("unselect", { detail: this }) as SelectionEvent;
         document.dispatchEvent(unselect);
