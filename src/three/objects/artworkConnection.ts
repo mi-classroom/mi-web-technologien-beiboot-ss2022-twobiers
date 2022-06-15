@@ -1,4 +1,4 @@
-import { LineCurve3, Mesh, MeshBasicMaterial, TubeGeometry, Vector3 } from "three";
+import { CatmullRomCurve3, LineCurve3, Mesh, MeshBasicMaterial, TubeGeometry, Vector3 } from "three";
 import { Artwork3DObject } from "./artwork";
 
 export class ArtworkConnection extends Mesh {
@@ -9,10 +9,19 @@ export class ArtworkConnection extends Mesh {
         const targetPoint = new Vector3();
         source.getWorldPosition(sourcePoint);
         target.getWorldPosition(targetPoint);
-        // sourcePoint.y -= (source.height / 2) * 10;
-        // targetPoint.y -= (target.height) / 2 * 10;
+        
+        // Buttom of artwork
+        sourcePoint.y -= (source.height / 2) * 10;
+        targetPoint.y -= (target.height / 2) * 10;
 
-        const curve = new LineCurve3(sourcePoint, targetPoint);
+
+        // On the ground
+        const p1 = new Vector3().copy(sourcePoint);
+        p1.y = 0.1;
+        const p2 = new Vector3().copy(targetPoint);
+        p2.y = 0.1;
+
+        const curve = new CatmullRomCurve3([sourcePoint, p1, p2, targetPoint ], false, "catmullrom", 0);
 
         const geometry = new TubeGeometry( curve, 100, 0.1, 8, false );
         const material = new MeshBasicMaterial( { color: 0x00ff00 } );
