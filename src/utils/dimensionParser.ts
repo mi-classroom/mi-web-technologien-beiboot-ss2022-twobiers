@@ -53,7 +53,6 @@ const parseNumericRepresentationFromDimensionString = (dimString: string): numbe
         const stringToParse = extractFirstOccurenceLine(dimString, literal);
         
         if(stringToParse !== undefined) {
-            console.log(stringToParse);
             return cleanDimensionRepresentation(stringToParse)
                 .split("x")
                 .map(dim => Number(dim));
