@@ -1,11 +1,12 @@
 import * as THREE from "three";
 import { Intersection, Scene } from "three";
-import { DimensionizedCdaItem } from "../types";
+import { CdaReferenceType, DimensionizedCdaItem } from "../types";
 import { CranachControls } from "./controls";
 import { Artwork3DObject } from "./objects/artwork";
 import { ArtworkConnection } from "./objects/artworkConnection";
 import { ArtworkGroup } from "./objects/artworkGroup";
 import { Crosshair } from "./objects/crosshair";
+import { REFERENCE_COLORS } from "./utils";
 
 const near = 0.1;
 
@@ -204,8 +205,8 @@ export class CranachScene extends Scene {
         // remove when ready.
         for(const artwork of this._artworkObjects) {
             const relatedArtworks = this.findRelatedArtworks(artwork);
-            if(relatedArtworks.length > 0) {
-                const connections = relatedArtworks.map(related => new ArtworkConnection(artwork, related));
+            for(const [kind, references] of Object.entries(relatedArtworks)) {
+                const connections = references.map(related => new ArtworkConnection(artwork, related, REFERENCE_COLORS[kind as CdaReferenceType]));
                 this.add(...connections);
             }
         }
@@ -223,12 +224,24 @@ export class CranachScene extends Scene {
             .find(intersection => intersection.distance < 20);
     }
 
-    private findRelatedArtworks(artwork: Artwork3DObject): Artwork3DObject[] {
+    private findRelatedArtworks(artwork: Artwork3DObject): Record<CdaReferenceType, Artwork3DObject[]> {
         const references = artwork.userData.rawItem.references;
+        const refObjects = {} as Record<CdaReferenceType, Artwork3DObject[]>;
         if(references === undefined || references?.length === 0) {
-            return [];
+            return refObjects;
         }
-        return this._artworkObjects.filter(o => references.some(ref => ref.inventoryNumber === o.userData.rawItem.inventoryNumber));
+
+        for(const reference of references) {
+            const obj = this._artworkObjects.find(o => reference.inventoryNumber === o.userData.rawItem.inventoryNumber);
+            if(obj !== undefined) {
+                if(refObjects[reference.kind] === undefined) {
+                    refObjects[reference.kind] = [];
+                }
+                refObjects[reference.kind].push(obj);
+            }
+        }
+
+        return refObjects;
     }
 
     private selectNearestIntersectedArtwork() {
@@ -253,8 +266,10 @@ export class CranachScene extends Scene {
             const nearestObject = nearest.object;
             nearestObject.select();
             const relatedArtworks = this.findRelatedArtworks(nearestObject);
-            for(const related of relatedArtworks) {
-                related.highlightHoly();
+            for(const [kind, references] of Object.entries(relatedArtworks)) {
+                for (const ref of references) {
+                    ref.highlightHoly(REFERENCE_COLORS[kind as CdaReferenceType]);
+                }
             }
         }
     }

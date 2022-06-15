@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { ItemDimensions } from "../types";
+import { ColorRepresentation } from "three";
+import { CdaReferenceType, ItemDimensions } from "../types";
 
 interface Color {
     r: number;
@@ -121,3 +122,10 @@ export const dataProxyUrl = (str: string): string => {
     }
     return str.replaceAll("imageserver-2022", "data-proxy/image.php?subpath=");
 }
+
+export const REFERENCE_COLORS: Record<CdaReferenceType, ColorRepresentation> = {
+    BELONGS_TO: "0x00ff00",
+    PART_OF_WORK: "0xff0000",
+    RELATED_IN_CONTENT_TO: "0xffffff",
+    SIMILAR_TO: "0x0000ff" 
+};

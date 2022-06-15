@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { BufferGeometry, CylinderGeometry, LineCurve3, Mesh, MeshBasicMaterial, Object3D, TubeGeometry, Vector3 } from "three";
+import { BufferGeometry, ColorRepresentation, CylinderGeometry, Mesh, MeshBasicMaterial, Object3D } from "three";
 import { DimensionizedCdaItem, ItemDimensions } from "../../types";
 import { dataProxyUrl } from "../utils";
 
@@ -20,6 +20,7 @@ export const isArtworkObject = (object: Object3D) : object is Artwork3DObject =>
 export const artworkProperties = {
     enableVisualHighlight: false,
     highlightColor: 0x8cff32,
+    holyHighlightColor: 0xffdd00,
     scale: 0.1 // We assume that 1 unit is 1m
 };
 
@@ -105,7 +106,7 @@ export class Artwork3DObject extends Mesh {
         // return this.size.z;
     }
 
-    highlightHoly(): void {
+    highlightHoly(color: ColorRepresentation = artworkProperties.holyHighlightColor): void {
         if(this.isHolyHighlighted) {
             return;
         }
@@ -116,7 +117,7 @@ export class Artwork3DObject extends Mesh {
 
         const geometry = new CylinderGeometry(sphere.radius + 20, sphere.radius + 20, 1000, 64, 64, true);
         const material = new MeshBasicMaterial({ 
-            color: 0xffdd00,
+            color,
             transparent: true,
             opacity: 0.2
         });
@@ -157,10 +158,10 @@ export class Artwork3DObject extends Mesh {
         document.dispatchEvent(unselect);
     }
 
-    highlight(): void {
+    highlight(color: ColorRepresentation = artworkProperties.highlightColor): void {
         if(artworkProperties.enableVisualHighlight) {
             if(this.material instanceof MeshBasicMaterial) {
-                this.material.color.set(artworkProperties.highlightColor);
+                this.material.color.set(color);
             }
         }
         this.isHighlighted = true;
