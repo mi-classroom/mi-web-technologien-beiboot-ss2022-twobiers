@@ -209,6 +209,12 @@ export class CranachScene extends Scene {
                 this.add(...connections);
             }
         }
+
+        // TODO: For the moment we will holy highlight every artwork for development purposes.
+        // remove when ready.
+        // for(const artwork of this._artworkObjects) {
+        //    artwork.highlightHoly();
+        // }
     }
 
     private findNearestIntersectedArtwork(): Intersection<Artwork3DObject> | undefined {
@@ -229,18 +235,26 @@ export class CranachScene extends Scene {
         const nearest = this.findNearestIntersectedArtwork();
         
         // Lets just (un)select if we do really have a intersection available 
-        if (nearest && !nearest.object.isSelected) {
+        if (nearest) {
             const alreadySelected = this._artworkObjects.filter(aw => aw.isSelected);
             for(const selected of alreadySelected) {
                 selected.unselect();
+            }
+            const alreadyHolyHighlighted = this._artworkObjects.filter(aw => aw.isHolyHighlighted);
+            for(const holy of alreadyHolyHighlighted) {
+                holy.unhighlightHoly();
+            }
+
+            // If we select some artwork object twice, we treat it as a deselection
+            if(alreadySelected.some(s => s.id === nearest.object.id)) {
+                return;
             }
 
             const nearestObject = nearest.object;
             nearestObject.select();
             const relatedArtworks = this.findRelatedArtworks(nearestObject);
-            if(relatedArtworks.length > 0) {
-                const connections = relatedArtworks.map(related => new ArtworkConnection(nearestObject, related));
-                this.add(...connections);
+            for(const related of relatedArtworks) {
+                related.highlightHoly();
             }
         }
     }
