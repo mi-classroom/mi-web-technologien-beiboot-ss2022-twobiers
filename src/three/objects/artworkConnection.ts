@@ -21,7 +21,7 @@ export class ArtworkConnection extends Mesh {
         const endGround = new Vector3().copy(targetPoint);
         endGround.y = 0.5;
 
-        const curve = new CatmullRomCurve3([sourcePoint, startGround, endGround, targetPoint ], false, "catmullrom", 0.1);
+        const curve = new CatmullRomCurve3([sourcePoint, startGround, endGround, targetPoint ], false, "catmullrom", 0);
 
         const geometry = new TubeGeometry( curve, 100, 0.1, 8, false );
         const material = new MeshBasicMaterial( { color } );

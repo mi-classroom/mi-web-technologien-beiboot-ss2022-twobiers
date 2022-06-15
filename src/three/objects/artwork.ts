@@ -115,16 +115,20 @@ export class Artwork3DObject extends Mesh {
         }
         const sphere = this.geometry.boundingSphere!;
 
-        const geometry = new CylinderGeometry(sphere.radius + 20, sphere.radius + 20, 1000, 64, 64, true);
+        const cylinderHeight = 10000; // To the sky.. Well also through the ground. But however...
+        const spotRadius = sphere.radius + 10;
+
+        const geometry = new CylinderGeometry(spotRadius, spotRadius, cylinderHeight, 64, 64, true);
         const material = new MeshBasicMaterial({ 
             color,
             transparent: true,
-            opacity: 0.2
+            opacity: 0.15
         });
         const holyMesh = new THREE.Mesh(geometry, material);
         holyMesh.name = "holy-mesh";
 
         this.add(holyMesh);
+
         this.isHolyHighlighted = true;
     }
 
