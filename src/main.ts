@@ -107,6 +107,7 @@ const buildArtworkSelection = (artwork: DimensionizedCdaItem): HTMLDivElement =>
 
     textDiv.innerHTML = `
         <h1>${artwork.metadata.title}</h1>
+        <a href="https://lucascranach.org/en/${artwork.inventoryNumber}" target="_blank">Link to Archive</a>
     `;
 
     const previewDiv = document.createElement("div");
