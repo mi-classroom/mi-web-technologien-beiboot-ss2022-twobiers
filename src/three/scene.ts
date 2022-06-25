@@ -80,7 +80,12 @@ export class CranachScene extends Scene {
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         window.addEventListener("resize", () => this.onWindowResize());
-        this.renderer.domElement.addEventListener("click", () => this.selectNearestIntersectedArtwork());
+        this.renderer.domElement.addEventListener("click", (event) => {
+            // Left click 
+            if(event.button === 0) {
+                this.selectNearestIntersectedArtwork();
+            }
+        });
 
         // Camera
         this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -201,8 +206,6 @@ export class CranachScene extends Scene {
             this.add(group);
         }
 
-        // TODO: For the moment we will render also the relation connections for development purposes.
-        // remove when ready.
         for(const artwork of this._artworkObjects) {
             const relatedArtworks = this.findRelatedArtworks(artwork);
             for(const [kind, references] of Object.entries(relatedArtworks)) {
