@@ -1,10 +1,12 @@
 import * as THREE from "three";
-import { Scene } from "three";
-import { DimensionizedCdaItem } from "../types";
+import { Intersection, Scene } from "three";
+import { CdaReferenceType, DimensionizedCdaItem } from "../types";
 import { CranachControls } from "./controls";
 import { Artwork3DObject } from "./objects/artwork";
+import { ArtworkConnection } from "./objects/artworkConnection";
 import { ArtworkGroup } from "./objects/artworkGroup";
 import { Crosshair } from "./objects/crosshair";
+import { REFERENCE_COLORS } from "./utils";
 
 const near = 0.1;
 
@@ -58,9 +60,10 @@ export class CranachScene extends Scene {
         antialias: true,
         powerPreference: "high-performance"
     });
+    public readonly eyeheight = 1.70 / near;
     public readonly floor: THREE.Mesh;
     private readonly clock = new THREE.Clock();
-    private readonly controls = new CranachControls(this.camera, this.renderer.domElement);
+    private readonly controls = new CranachControls(this.camera, this.renderer.domElement, this.eyeheight);
     private readonly raycaster = new THREE.Raycaster();
     private readonly coords = new THREE.Vector2();
     
@@ -77,6 +80,12 @@ export class CranachScene extends Scene {
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         window.addEventListener("resize", () => this.onWindowResize());
+        this.renderer.domElement.addEventListener("click", (event) => {
+            // Left click 
+            if(event.button === 0) {
+                this.selectNearestIntersectedArtwork();
+            }
+        });
 
         // Camera
         this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -130,7 +139,7 @@ export class CranachScene extends Scene {
     }
 
     resetCamera() {
-        this.camera.position.set(10, 1.70 / near, -10); // We assume a person with about 1,75m body size. 5cm difference for eye height. Still needs to be aligned with camera field
+        this.camera.position.set(10, this.eyeheight, -10); // We assume a person with about 1,75m body size. 5cm difference for eye height. Still needs to be aligned with camera field
         this.camera.rotation.set(0, 180 * Math.PI / 180, 0); // Turn around
     }
 
@@ -196,12 +205,81 @@ export class CranachScene extends Scene {
             
             this.add(group);
         }
+
+        for(const artwork of this._artworkObjects) {
+            const relatedArtworks = this.findRelatedArtworks(artwork);
+            for(const [kind, references] of Object.entries(relatedArtworks)) {
+                const connections = references.map(related => new ArtworkConnection(artwork, related, REFERENCE_COLORS[kind as CdaReferenceType]));
+                this.add(...connections);
+            }
+        }
+
+        // TODO: For the moment we will holy highlight every artwork for development purposes.
+        // remove when ready.
+        // for(const artwork of this._artworkObjects) {
+        //    artwork.highlightHoly();
+        // }
+    }
+
+    private findNearestIntersectedArtwork(): Intersection<Artwork3DObject> | undefined {
+        this._artworkIntersections.length = 0;
+        return this.raycaster.intersectObjects<Artwork3DObject>(this._artworkObjects, false, this._artworkIntersections)
+            .find(intersection => intersection.distance < 20);
+    }
+
+    private findRelatedArtworks(artwork: Artwork3DObject): Record<CdaReferenceType, Artwork3DObject[]> {
+        const references = artwork.userData.rawItem.references;
+        const refObjects = {} as Record<CdaReferenceType, Artwork3DObject[]>;
+        if(references === undefined || references?.length === 0) {
+            return refObjects;
+        }
+
+        for(const reference of references) {
+            const obj = this._artworkObjects.find(o => reference.inventoryNumber === o.userData.rawItem.inventoryNumber);
+            if(obj !== undefined) {
+                if(refObjects[reference.kind] === undefined) {
+                    refObjects[reference.kind] = [];
+                }
+                refObjects[reference.kind].push(obj);
+            }
+        }
+
+        return refObjects;
+    }
+
+    private selectNearestIntersectedArtwork() {
+        const nearest = this.findNearestIntersectedArtwork();
+        
+        // Lets just (un)select if we do really have a intersection available 
+        if (nearest) {
+            const alreadySelected = this._artworkObjects.filter(aw => aw.isSelected);
+            for(const selected of alreadySelected) {
+                selected.unselect();
+            }
+            const alreadyHolyHighlighted = this._artworkObjects.filter(aw => aw.isHolyHighlighted);
+            for(const holy of alreadyHolyHighlighted) {
+                holy.unhighlightHoly();
+            }
+
+            // If we select some artwork object twice, we treat it as a deselection
+            if(alreadySelected.some(s => s.id === nearest.object.id)) {
+                return;
+            }
+
+            const nearestObject = nearest.object;
+            nearestObject.select();
+            const relatedArtworks = this.findRelatedArtworks(nearestObject);
+            for(const [kind, references] of Object.entries(relatedArtworks)) {
+                for (const ref of references) {
+                    ref.highlightHoly(REFERENCE_COLORS[kind as CdaReferenceType]);
+                }
+            }
+        }
     }
 
     private highlightIntersectedArtworks() {
         this._artworkIntersections.length = 0;
-        const nearest = this.raycaster.intersectObjects<Artwork3DObject>(this._artworkObjects, false, this._artworkIntersections)
-            .find(intersection => intersection.distance < 20);
+        const nearest = this.findNearestIntersectedArtwork();
         
         // Only highlight first
         if (nearest) {

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { BufferGeometry, Mesh, MeshBasicMaterial, Object3D } from "three";
+import { BufferGeometry, ColorRepresentation, CylinderGeometry, Mesh, MeshBasicMaterial, Object3D } from "three";
 import { DimensionizedCdaItem, ItemDimensions } from "../../types";
 import { dataProxyUrl } from "../utils";
 
@@ -7,6 +7,10 @@ type ArtworkUserData = {
     year: number,
     rawItem: DimensionizedCdaItem 
 };
+
+export interface SelectionEvent extends CustomEvent {
+    detail: Artwork3DObject
+}
 
 // Very trivial type guard, but sufficient
 export const isArtworkObject = (object: Object3D) : object is Artwork3DObject => {
@@ -16,6 +20,7 @@ export const isArtworkObject = (object: Object3D) : object is Artwork3DObject =>
 export const artworkProperties = {
     enableVisualHighlight: false,
     highlightColor: 0x8cff32,
+    holyHighlightColor: 0xffdd00,
     scale: 0.1 // We assume that 1 unit is 1m
 };
 
@@ -30,6 +35,8 @@ const createGeometry = (dimensions: ItemDimensions): THREE.BufferGeometry => {
 
 export class Artwork3DObject extends Mesh {
     public isHighlighted: boolean = false;    
+    public isSelected: boolean = false;    
+    public isHolyHighlighted: boolean = false;    
     private _artworkRef: DimensionizedCdaItem;
     public userData: ArtworkUserData;
     public readonly name = "artwork";
@@ -99,10 +106,66 @@ export class Artwork3DObject extends Mesh {
         // return this.size.z;
     }
 
-    highlight(): void {
+    highlightHoly(color: ColorRepresentation = artworkProperties.holyHighlightColor): void {
+        if(this.isHolyHighlighted) {
+            return;
+        }
+        if(this.geometry.boundingSphere === null) {
+            this.geometry.computeBoundingSphere();
+        }
+        const sphere = this.geometry.boundingSphere!;
+
+        const cylinderHeight = 10000; // To the sky.. Well also through the ground. But however...
+        const spotRadius = sphere.radius + 10;
+
+        const geometry = new CylinderGeometry(spotRadius, spotRadius, cylinderHeight, 64, 64, true);
+        const material = new MeshBasicMaterial({ 
+            color,
+            transparent: true,
+            opacity: 0.15
+        });
+        const holyMesh = new THREE.Mesh(geometry, material);
+        holyMesh.name = "holy-mesh";
+
+        this.add(holyMesh);
+
+        this.isHolyHighlighted = true;
+    }
+
+    unhighlightHoly(): void {
+        if(!this.isHolyHighlighted) {
+            return;
+        }
+        for(const holyChild of this.children.filter(c => c.name === "holy-mesh")) {
+            this.remove(holyChild);
+            this.isHolyHighlighted = false;
+        }
+    }
+
+    select(): void {
+        if(this.isSelected) {
+            return;
+        }
+        this.isSelected = true;
+        this.highlightHoly();
+        const selectEvent = new CustomEvent("select", { detail: this }) as SelectionEvent;
+        document.dispatchEvent(selectEvent);
+    }
+
+    unselect(): void {
+        if(!this.isSelected) {
+            return;
+        }
+        this.isSelected = false;
+        this.unhighlightHoly();
+        const unselect = new CustomEvent("unselect", { detail: this }) as SelectionEvent;
+        document.dispatchEvent(unselect);
+    }
+
+    highlight(color: ColorRepresentation = artworkProperties.highlightColor): void {
         if(artworkProperties.enableVisualHighlight) {
             if(this.material instanceof MeshBasicMaterial) {
-                this.material.color.set(artworkProperties.highlightColor);
+                this.material.color.set(color);
             }
         }
         this.isHighlighted = true;

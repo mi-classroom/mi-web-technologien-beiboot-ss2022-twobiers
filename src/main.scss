@@ -49,33 +49,74 @@ body {
     }
 }
 
-#info {
+#overlay {
     position: absolute;
     top: 0px;
     padding: 1rem;
     z-index: 100;
 
-    .info-container {
-        margin: 1rem;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        max-width: 32rem;
-        background-color: $dark;
-        display: flex;
-        flex-direction: row;
-        align-content: flex-start;
-        filter: opacity(0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-        .info-text {
-            flex-grow: 1;
-            width: 60%;
+    #selection {
+        .selection-container {
+            margin: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            max-width: 32rem;
+            background-color: $dark;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            filter: opacity(0.9);
+
+            a, a:visited, a:hover, a:active {
+                font-size: 1.5rem;
+                color: $accent-dark;
+            }
+
+            .selection-text {
+                padding: 1rem;
+                flex-grow: 1;
+                width: 80%;
+            }
+
+            .selection-preview {
+                flex-grow: 0;
+                width: 20%;
+                img {
+                    width: 100%;
+                }
+            }
         }
+    }
 
-        .info-preview {
-            flex-grow: 0;
-            width: 40%;
-            img {
-                width: 100%;
+    #info {
+        .info-container {
+            margin: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            max-width: 32rem;
+            background-color: $dark;
+            display: flex;
+            flex-direction: row;
+            align-content: flex-start;
+            filter: opacity(0.9);
+
+            .info-text {
+                flex-grow: 1;
+                width: 60%;
+            }
+
+            .info-preview {
+                flex-grow: 0;
+                width: 40%;
+                img {
+                    width: 100%;
+                }
             }
         }
     }
